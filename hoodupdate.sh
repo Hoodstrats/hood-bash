@@ -1,19 +1,47 @@
 #!/bin/bash
 
-#center this text
+#add list of available update stores like flatpak, snap, brew, etc
+cd "$(dirname "$0")"
+
+stores=()
+#get stores from a text file within the same directory seperated by new lines
+mapfile -t stores < ./stores.txt
+
+#set the color of the text to bright yellow
+echo -e "\e[33m"
 echo "==============================="
 echo "Hoodstrats Update Utility v1.0"
-echo "==============================="
+echo -e "==============================="
+echo -e "\e[0m"
 
 function checkForInput() {
   #this is the first argument passed to the function
   local args=$1
   if [ "$1" != "y" ]; then
+    echo -e "\e[33m"
     echo "Ok. Guess not..."
     exit 1
   else
+    checkStores
+    sleep 2
     runUpdate
   fi
+}
+
+function checkStores() {
+  echo -e "Checking for installed update stores..."
+  for store in "${stores[@]}"; do
+    sleep 1
+    if [ -x "$(command -v $store)" ]; then
+      echo -e "\e[32m"
+      echo -e "$store is installed.\n"
+    else
+      echo -e "\e[31m"
+      echo -e "$store is not installed.\n"
+    fi
+  done
+  echo -e "\e[0m"
+  echo "==============================="
 }
 
 function runUpdate() {
@@ -30,11 +58,13 @@ function runUpdate() {
     sudo apt upgrade -y
   fi
   sleep 2
+  echo "==============================="
   if [ -x "$(command -v flatpak)" ]; then
     echo -e "Checking for Flatpak updates...\n"
     flatpak update
   fi
   sleep 2
+  echo "==============================="
   #check if the user has brew installed
   if [ -x "$(command -v brew)" ]; then
     echo -e "Checking for brew updates...\n"
@@ -47,12 +77,13 @@ function runUpdate() {
     fi
   fi
   sleep 2
+  echo "==============================="
   if [ -x "$(command -v snap)" ]; then
     echo -e "Checking for Snap updates...\n"
     snap refresh
   fi
   echo -e "\nAll updates have been checked for and installed."
-  echo -e "\nExiting terminal..."
+  echo -e "\nExiting script..."
   sleep 2
   exit 1
 }
