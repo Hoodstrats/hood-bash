@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 stores=()
 #get stores from a text file within the same directory seperated by new lines
-mapfile -t stores < ./stores.txt
+mapfile -t stores <./stores.txt
 
 #set the color of the text to bright yellow
 echo -e "\e[33m"
@@ -83,7 +83,33 @@ function runUpdate() {
     snap refresh
   fi
   echo -e "\nAll updates have been checked for and installed."
-  echo -e "\nExiting script..."
+  runClean
+}
+
+function runClean() {
+  echo -e "==============================="
+  echo -e "Doing some house keeping...\n"
+  
+  echo -e "Cleaning up APT...\n"
+  sudo apt autoremove -y
+ 
+  if [ -x "$(command -v flatpak)" ]; then
+    echo -e "Cleaning up Flatpak...\n"
+    flatpak uninstall --unused
+  fi
+ 
+  sleep 2
+  echo "==============================="
+ 
+  if [ -x "$(command -v brew)" ]; then
+    echo -e "Cleaning up Brew...\n"
+    brew cleanup
+  fi
+
+  sleep 2
+  echo "==============================="
+  echo -e "\nJobs done!"
+  echo -e "\nExiting script!"
   sleep 2
   exit 1
 }
