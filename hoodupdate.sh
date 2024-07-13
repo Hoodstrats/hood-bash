@@ -34,10 +34,10 @@ function checkStores() {
     sleep 1
     if [ -x "$(command -v $store)" ]; then
       echo -e "\e[32m"
-      echo -e "$store is installed.\n"
+      echo -e "$store is installed"
     else
       echo -e "\e[31m"
-      echo -e "$store is not installed.\n"
+      echo -e "$store is not installed"
     fi
   done
   echo -e "\e[0m"
@@ -57,13 +57,13 @@ function runUpdate() {
     echo "There are $numUpgradable updates available."
     sudo apt upgrade -y
   fi
-  sleep 2
+  sleep 1
   echo "==============================="
   if [ -x "$(command -v flatpak)" ]; then
     echo -e "Checking for Flatpak updates...\n"
     flatpak update
   fi
-  sleep 2
+  sleep 1
   echo "==============================="
   #check if the user has brew installed
   if [ -x "$(command -v brew)" ]; then
@@ -76,7 +76,7 @@ function runUpdate() {
       echo -e "No brew upgrades available...\n"
     fi
   fi
-  sleep 2
+  sleep 1
   echo "==============================="
   if [ -x "$(command -v snap)" ]; then
     echo -e "Checking for Snap updates...\n"
@@ -89,28 +89,31 @@ function runUpdate() {
 function runClean() {
   echo -e "==============================="
   echo -e "Doing some house keeping...\n"
-  
+
   echo -e "Cleaning up APT...\n"
   sudo apt auto-remove -y
+
+  sleep 1
+  echo -e "==============================="
  
   if [ -x "$(command -v flatpak)" ]; then
     echo -e "Cleaning up Flatpak...\n"
     flatpak uninstall --unused
   fi
- 
-  sleep 2
+
+  sleep 1
   echo "==============================="
- 
+
   if [ -x "$(command -v brew)" ]; then
     echo -e "Cleaning up Brew...\n"
     brew cleanup
   fi
 
-  sleep 2
+  sleep 1
   echo "==============================="
   echo -e "\nJobs done!"
   echo -e "\nExiting script!"
-  sleep 2
+  sleep 1
   exit 1
 }
 
