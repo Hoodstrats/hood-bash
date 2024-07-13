@@ -91,7 +91,7 @@ function runClean() {
   echo -e "Doing some house keeping...\n"
   
   echo -e "Cleaning up APT...\n"
-  sudo apt autoremove -y
+  sudo apt auto-remove -y
  
   if [ -x "$(command -v flatpak)" ]; then
     echo -e "Cleaning up Flatpak...\n"
