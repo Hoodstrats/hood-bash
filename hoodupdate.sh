@@ -92,10 +92,10 @@ function runClean() {
 
   echo -e "Cleaning up APT...\n"
   sudo apt auto-remove -y
-
+  sudo apt autoclean
   sleep 1
   echo -e "==============================="
- 
+
   if [ -x "$(command -v flatpak)" ]; then
     echo -e "Cleaning up Flatpak...\n"
     flatpak uninstall --unused
