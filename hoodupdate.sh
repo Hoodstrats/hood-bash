@@ -1,30 +1,41 @@
 #!/bin/bash
+#TODO: UDPATE THE SCRIPT WITH THE CHECKEDSTORES ARRAY FUNCTIONALITY FROM SEARCH SCRIPT
 
-#add list of available update stores like flatpak, snap, brew, etc
+#set the current directory to the directory of the script
+#this way we have a reference point for the stores.txt file
 cd "$(dirname "$0")"
 
 stores=()
 #get stores from a text file within the same directory seperated by new lines
 mapfile -t stores <./stores.txt
 
-#set the color of the text to bright yellow
-echo -e "\e[33m"
+#set the color of the text to bright green
+echo -e "\e[32m"
 echo "==============================="
 echo "Hoodstrats Update Utility v1.0"
-echo -e "==============================="
+echo "==============================="
 echo -e "\e[0m"
 
+#add another choice and run the hoodsearch bash script if they choose it
 function checkForInput() {
   #this is the first argument passed to the function
   local args=$1
-  if [ "$1" != "y" ]; then
-    echo -e "\e[33m"
-    echo "Ok. Guess not..."
-    exit 1
-  else
+  if [ "$1" == "y" ]; then
     checkStores
     sleep 2
     runUpdate
+  elif [ "$1" == "n" ]; then
+    echo -e "\n"
+    read -p "Would you like to search for an APP? (y/n) " RESPONSE
+    if [ "$RESPONSE" == "y" ]; then
+      ./hoodsearch.sh
+    else
+      echo -e "\e[31mOk. Guess not...\e[0m"
+      exit 1
+    fi
+  else
+    echo -e "\e[31mOk. Guess not...\e[0m"
+    exit 1
   fi
 }
 
@@ -33,14 +44,11 @@ function checkStores() {
   for store in "${stores[@]}"; do
     sleep 1
     if [ -x "$(command -v $store)" ]; then
-      echo -e "\e[32m"
-      echo -e "$store is installed"
+      echo -e "\e[32m$store is installed\e[0m"
     else
-      echo -e "\e[31m"
-      echo -e "$store is not installed"
+      echo -e "\e[31m$store is not installed\e[0m"
     fi
   done
-  echo -e "\e[0m"
   echo "==============================="
 }
 
@@ -111,12 +119,13 @@ function runClean() {
 
   sleep 1
   echo "==============================="
-  echo -e "\nJobs done!"
-  echo -e "\nExiting script!"
+  echo -e "\nJobs done, exiting script!"
   sleep 1
   exit 1
 }
 
+#open the script with this but wihin the checkforinput method if they say n give them the other option
+#to run the search script
 read -p "Yo, you want to check for updates? (y/n) " RESPONSE
 
 #call the function and pass the RESPONSE variable
