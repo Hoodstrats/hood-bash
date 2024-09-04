@@ -1,4 +1,4 @@
 apt
-flatpak
 brew
+flatpak
 snap

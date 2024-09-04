@@ -42,7 +42,6 @@ function checkForInput() {
 function checkStores() {
   echo -e "Checking for installed update stores..."
   for store in "${stores[@]}"; do
-    sleep 1
     if [ -x "$(command -v $store)" ]; then
       echo -e "\e[32m$store is installed\e[0m"
     else

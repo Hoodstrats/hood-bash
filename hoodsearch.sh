@@ -7,10 +7,12 @@ stores=()
 checkedStores=()
 
 searchCommands=(
-  #apt
+  #apt can also use regular expressions with ^$ to match the exact name ex: apt search --names-only ^python3$
   "search --names-only"
-  #brew, snap, flatpak
+  #brew, snap
   "search"
+  #flatpak
+  "search --columns=name"
 )
 #stores that have the app after search
 storesWithApps=()
@@ -35,7 +37,6 @@ echo -e "\e[0m"
 function checkStores() {
   echo -e "\nChecking for installed update stores..."
   for store in "${stores[@]}"; do
-    sleep 1
     if [ -x "$(command -v $store)" ]; then
       echo -e "\e[32m$store is installed\e[0m"
       #populate with actually installed stores
@@ -47,39 +48,39 @@ function checkStores() {
   echo "==============================="
   searchStores
 }
-#TODO: for each store that gets a hit back we must put it in a array and then ask the user which store they would like to download from using numbers or just letters to simplify the process/less typing....
-#then run the appropiate INSTALL command just like we use the correct install command
+
 function searchStores() {
   read -p "What APP would you like to search for? " RESPONSE
+  #search each available store for the app
   for store in "${checkedStores[@]}"; do
     if [ -x "$(command -v $store)" ]; then
       case $store in
       "apt")
         echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
-        sudo apt ${searchCommands[0]} $RESPONSE
-        #add to array of stores that have the app
-        addCheckedStores "$store" "$RESPONSE"
+        # sudo apt ${searchCommands[0]} "^$RESPONSE$"
+        search_output=$(sudo apt ${searchCommands[0]} "^$RESPONSE$")
+        addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
         echo -e "\n"
         ;;
       "brew")
         echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
-        brew ${searchCommands[1]} $RESPONSE
-        addCheckedStores "$store" "$RESPONSE"
+        search_output=$(brew ${searchCommands[1]} "$RESPONSE")
+        addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
         echo -e "\n"
         ;;
       "snap")
         echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
-        snap ${searchCommands[1]} $RESPONSE
-        addCheckedStores "$store" "$RESPONSE"
+        search_output=$(snap ${searchCommands[1]} "$RESPONSE")
+        addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
         echo -e "\n"
         ;;
       "flatpak")
         echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
-        flatpak ${searchCommands[1]} $RESPONSE
-        addCheckedStores "$store" "$RESPONSE"
+        search_output=$(flatpak ${searchCommands[2]} "$RESPONSE")
+        addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
         echo -e "\n"
         ;;
@@ -89,18 +90,20 @@ function searchStores() {
       esac
     fi
   done
-  #TODO: ask user which store they would like to download from
-  #create function
-  #pass in the response (the app name)
+  #ask user to choose which store to install from
   chooseStore "$RESPONSE"
 }
 
 function addCheckedStores() {
-  if [ $? -eq 0 ]; then
-    echo -e "\e[32m$1 found $2\e[0m"
+  # Check if the search term is within the results
+  #using grep -i to ignore case and -w to match whole words -q to suppress output
+  #using ^$ to match the exact name of the app like we do for apt
+  if echo "$2" | grep -iqw "^$3$"; then
+    echo -e "\e[32m$1 found $3\e[0m"
     storesWithApps+=("$1")
+    echo "$2"
   else
-    echo -e "\e[31m$1 did not find $2\e[0m"
+    echo -e "\e[31m$1 did not find $3\e[0m"
   fi
 }
 
