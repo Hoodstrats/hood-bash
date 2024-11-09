@@ -87,7 +87,7 @@ function runUpdate() {
   echo "==============================="
   if [ -x "$(command -v snap)" ]; then
     echo -e "Checking for Snap updates...\n"
-    snap refresh
+    sudo snap refresh
   fi
   echo -e "\nAll updates have been checked for and installed."
   runClean
