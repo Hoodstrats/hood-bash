@@ -33,6 +33,18 @@ echo "Hoodstrats Search Utility v1.0"
 echo "==============================="
 echo -e "\e[0m"
 
+#just to make sure there's internet available period
+check_internet() {
+    echo -e "\e[33mChecking for internet connection...\e[0m"
+    if ping -c 1 8.8.8.8 &> /dev/null; then
+        echo -e "\e[32mInternet connection available\e[0m"
+        checkStores
+    else
+        echo -e "\e[31mNo internet connection\e[0m"
+        echo -e "\e[31mExiting...\e[0m"
+    fi
+}
+
 #check installed stores
 function checkStores() {
   echo -e "\nChecking for installed update stores..."
@@ -146,4 +158,5 @@ function installAPP() {
   echo -e "\nJobs done, exiting script!"
   exit 1
 }
-checkStores
+
+check_internet
