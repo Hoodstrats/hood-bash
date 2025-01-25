@@ -1,18 +1,14 @@
-# Hoodstrats Update Utility
+# Hood BASH practice repo
 
 ## Overview
+This is a collection of different tools and utilities I've made and use myself in BASH. 
+There might be other scripts out there that do the same thing but this is mostly me practicing some SHELL scripting as I continue my journey deeper into the Linux OS
 
-This is V1.0 of an update utility I made for Linux. I got tired of having to manually type in "sudo apt update" then "sudo apt upgrade" etc... I wanted one simple command that would go ahead and update all my app package managers at once. With this script all you have to do is type "update" or whatever alias you decide to give this script in your bash/zsh setup and it will check/update apt, flatpak, snap, and brew if you have them installed. 
+---
+## Scripts
+[hoodupdate.sh](Update.md)
 
-### This script assumes you have the following utilities installed:
-#### *it will skip these automatically if you don't*
-
-- Bash shell (can also work for zsh)
-- `sudo` privileges for installing updates
-  - `apt` 
-  - `flatpak` 
-  - `brew` 
-  - `snap` 
+---
 
 ## Installation: setting the script up Globally
 ### **Make the script executable**:
