@@ -7,10 +7,11 @@ There might be other scripts out there that do the same thing but this is mostly
 ---
 ## Scripts
 [hoodupdate.sh](Update.md)
-
+[timerscript.sh](Timer.md)
+[hoodsearch.sh](Search.md)
 ---
 
-## Installation: setting the script up Globally
+## Installation: setting the different scripts System wide
 ### **Make the script executable**:
 Add execute permissions to the script file by running the following command in the terminal:
 ```bash

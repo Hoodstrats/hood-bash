@@ -4,6 +4,7 @@ cd "$(dirname "$0")"
 
 stores=()
 
+#populate this after search with results
 checkedStores=()
 
 searchCommands=(
@@ -35,14 +36,14 @@ echo -e "\e[0m"
 
 #just to make sure there's internet available period
 check_internet() {
-    echo -e "\e[33mChecking for internet connection...\e[0m"
-    if ping -c 1 8.8.8.8 &> /dev/null; then
-        echo -e "\e[32mInternet connection available\e[0m"
-        checkStores
-    else
-        echo -e "\e[31mNo internet connection\e[0m"
-        echo -e "\e[31mExiting...\e[0m"
-    fi
+  echo -e "\e[33mChecking for internet connection...\e[0m"
+  if ping -c 1 8.8.8.8 &>/dev/null; then
+    echo -e "\e[32mInternet connection available\e[0m"
+    checkStores
+  else
+    echo -e "\e[31mNo internet connection\e[0m"
+    echo -e "\e[31mExiting...\e[0m"
+  fi
 }
 
 #check installed stores
@@ -61,6 +62,8 @@ function checkStores() {
   searchStores
 }
 
+# TODO:extend this to account for whether or not the user passed in -b flag
+# if -b flag is passed in then remove specific search
 function searchStores() {
   read -p "What APP would you like to search for? " RESPONSE
   #search each available store for the app
@@ -70,28 +73,33 @@ function searchStores() {
       "apt")
         echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
         # sudo apt ${searchCommands[0]} "^$RESPONSE$"
-        search_output=$(sudo apt ${searchCommands[0]} "^$RESPONSE$")
+        search_output=$(apt ${searchCommands[0]} "^$RESPONSE"'$')
         addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
         echo -e "\n"
         ;;
+
       "brew")
         echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
-        search_output=$(brew ${searchCommands[1]} "$RESPONSE")
-        addCheckedStores "$store" "$search_output" "$RESPONSE"
-        echo "==============================="
-        echo -e "\n"
-        ;;
-      "snap")
-        echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
-        search_output=$(snap ${searchCommands[1]} "$RESPONSE")
+        search_output=$(brew ${searchCommands[1]} "/^$RESPONSE/")
         addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
         echo -e "\n"
         ;;
       "flatpak")
         echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
-        search_output=$(flatpak ${searchCommands[2]} "$RESPONSE")
+        search_output=$(flatpak ${searchCommands[1]} "$RESPONSE")
+        #grep the search output for the exact name of the app
+        #using -i to ignore case and -w to match whole words
+        search_output=$(echo "$search_output" | grep -iw "$RESPONSE")
+        addCheckedStores "$store" "$search_output" "$RESPONSE"
+        echo "==============================="
+        echo -e "\n"
+        ;;
+
+      "snap")
+        echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
+        search_output=$(snap ${searchCommands[1]} "$RESPONSE")
         addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
         echo -e "\n"
@@ -110,7 +118,7 @@ function addCheckedStores() {
   # Check if the search term is within the results
   #using grep -i to ignore case and -w to match whole words -q to suppress output
   #using ^$ to match the exact name of the app like we do for apt
-  if echo "$2" | grep -iqw "^$3$"; then
+  if echo "$2" | grep -iqw "$3"; then
     echo -e "\e[32m$1 found $3\e[0m"
     storesWithApps+=("$1")
     echo "$2"
@@ -154,9 +162,20 @@ function installAPP() {
     ;;
   esac
   echo -e "\n"
+  # store this info right here into a text file or the stores text
   echo -e "\e[32m$1 has been installed from $2...\e[0m"
+  # print the installed info to file
+  # using >> instead > APPENDS to file and doesn't overwrite it
+  printf "%s\n" "$1 from $2" >>installed.txt
+
   echo -e "\nJobs done, exiting script!"
   exit 1
 }
 
-check_internet
+#check to see if the response is one of the flags
+if [[ "$1" == "-installed" || "$1" == "-i" ]]; then
+  echo -e "\e[32mList of apps installed using this tool:\e[0m"
+  cat installed.txt
+else
+  check_internet
+fi
