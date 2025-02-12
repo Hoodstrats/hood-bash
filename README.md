@@ -10,6 +10,9 @@ There might be other scripts out there that do the same thing but this is mostly
 [timerscript.sh](Timer.md)
 [hoodsearch.sh](Search.md)
 ---
+## Requirements (tools the script uses which should be part of your distro already):
+- grep
+- cat
 
 ## Installation: setting the different scripts System wide
 ### **Make the script executable**:

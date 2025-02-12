@@ -1,6 +1,17 @@
+# Summary of idea/goal      
+- New bash script Store searcher
+	- checks for all installed stores like the auto updater
+	- when you type in "find or search" 'x(name of app)' it'll go and search all the 
+	available stores that you have for that app and return 
+		- brew currently doesn't have 'x'
+		- flatpak found 'x'
+		- snap found 'x'
+	- asks the user which option they would like to download from 
+		- use the 1 - whatever number selector from the godot update bash script and
+		whatever number they choose it'll go ahead and run the right command for that store
+		
 # ADDED:
 -[x] Made the APT portion of the search get EXACT matches using the ^name$ syntax. eg: apt search ^python$
--[ ] include option to "broaden" search which disables all specifics from 
 each different search
 -[x] when and if the user decides to install make it write to file, to keep track of what app and which store (currently "installed.txt")
 -[x] add function to retrieve list of already installed applications 
@@ -24,19 +35,3 @@ each different search
 	-[ ] broaden search functionality by passing in flags such as "-b" and then it will activate a broader search
 	by disabling the specific searches (need to extend the search stores)
 -[ ] add ability to search directly if the user enters app name after search command
-
-# Summary of idea/goal      
-- New bash script Store searcher
-	- checks for all installed stores like the auto updater
-	- when you type in "find or search" 'x(name of app)' it'll go and search all the 
-	available stores that you have for that app and return 
-		- brew currently doesn't have 'x'
-		- flatpak found 'x'
-		- snap found 'x'
-	- asks the user which option they would like to download from 
-		- use the 1 - whatever number selector from the godot update bash script and
-		whatever number they choose it'll go ahead and run the right command for that store
-		
-- Separate the 2 scripts
-    - give the search one a custom command just like the update one so all you have to do in the terminal is type in "search <appname>"
-    - finish simplifying the sentences with color can do them in 1 line each now
