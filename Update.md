@@ -1,6 +1,6 @@
 # Hoodstrats Update Utility
 
-## Overview
+### Overview
 
 This is V1.0 of an update utility I made for Linux. I got tired of having to manually type in "sudo apt update" then "sudo apt upgrade" etc... I wanted one simple command that would go ahead and update all my app package managers at once. With this script all you have to do is type "update" or whatever alias you decide to give this script in your bash/zsh setup and it will check/update apt, flatpak, snap, and brew if you have them installed. 
 
@@ -13,4 +13,3 @@ This is V1.0 of an update utility I made for Linux. I got tired of having to man
   - `flatpak` 
   - `brew` 
   - `snap` 
-

@@ -1,3 +1,6 @@
+# TODO: add the option to make Flatpak only show offically approved packages 
+# flatpak remote-modify --subset=verified flathub
+
 #set the current directory to the directory of the script
 #this way we have a reference point for the stores.txt file
 cd "$(dirname "$0")"
@@ -7,6 +10,7 @@ stores=()
 #populate this after search with results
 checkedStores=()
 
+# FIXME: extend stores file to include the search command
 searchCommands=(
   #apt can also use regular expressions with ^$ to match the exact name ex: apt search --names-only ^python3$
   "search --names-only"

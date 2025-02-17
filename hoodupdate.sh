@@ -1,5 +1,5 @@
 #!/bin/bash
-#TODO: UDPATE THE SCRIPT WITH THE CHECKEDSTORES ARRAY FUNCTIONALITY FROM SEARCH SCRIPT
+# TODO: UDPATE THE SCRIPT WITH THE CHECKEDSTORES ARRAY FUNCTIONALITY FROM SEARCH SCRIPT
 
 #set the current directory to the directory of the script
 #this way we have a reference point for the stores.txt file
