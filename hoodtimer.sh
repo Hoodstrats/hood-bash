@@ -1,4 +1,7 @@
 #!/bin/bash
+#===============================#
+#= @hoodstrats on all socials  =#
+#===============================#
 
 # Function to display how to use the command
 usage() {

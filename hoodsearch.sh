@@ -1,4 +1,7 @@
 #!/bin/bash
+#===============================#
+#= @hoodstrats on all socials  =#
+#===============================#
 
 # TODO: add the option to make Flatpak only show offically approved packages 
 # flatpak remote-modify --subset=verified flathub

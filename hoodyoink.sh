@@ -1,4 +1,7 @@
 #!/bin/bash
+#===============================#
+#= @hoodstrats on all socials  =#
+#===============================#
 
 # change the case statement to check for -ge instead of -lt and do the conversion
 function check_files() {

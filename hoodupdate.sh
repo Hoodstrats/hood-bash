@@ -1,4 +1,7 @@
 #!/bin/bash
+#===============================#
+#= @hoodstrats on all socials  =#
+#===============================#
 
 #set the current directory to the directory of the script
 #this way we have a reference point for the stores.txt file
