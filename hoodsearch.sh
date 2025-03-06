@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # TODO: add the option to make Flatpak only show offically approved packages 
 # flatpak remote-modify --subset=verified flathub
 
@@ -10,7 +12,7 @@ stores=()
 #populate this after search with results
 checkedStores=()
 
-# FIXME: extend stores file to include the search command
+# FIXME: extend stores file to include the search commands
 searchCommands=(
   #apt can also use regular expressions with ^$ to match the exact name ex: apt search --names-only ^python3$
   "search --names-only"
@@ -114,7 +116,6 @@ function searchStores() {
       esac
     fi
   done
-  #ask user to choose which store to install from
   chooseStore "$RESPONSE"
 }
 

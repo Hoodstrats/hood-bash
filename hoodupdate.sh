@@ -1,5 +1,4 @@
 #!/bin/bash
-# TODO: UDPATE THE SCRIPT WITH THE CHECKEDSTORES ARRAY FUNCTIONALITY FROM SEARCH SCRIPT
 
 #set the current directory to the directory of the script
 #this way we have a reference point for the stores.txt file
@@ -123,9 +122,5 @@ function runClean() {
   exit 1
 }
 
-#open the script with this but wihin the checkforinput method if they say n give them the other option
-#to run the search script
 read -p "Yo, you want to check for updates? (y/n) " RESPONSE
-
-#call the function and pass the RESPONSE variable
 checkForInput $RESPONSE

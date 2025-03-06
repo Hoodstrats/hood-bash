@@ -1,13 +1,50 @@
 # Hood BASH practice repo
 
 ## Overview
-This is a collection of different tools and utilities I've made and use myself in BASH. 
-There might be other scripts out there that do the same thing but this is mostly me practicing some SHELL scripting as I continue my journey deeper into the Linux OS
+This is an ever growing collection of Bash scripts I've made and use myself.
+There might be other scripts out there that do the same thing but I decided to make my own in order to practice some Bash scripting, as I continue my journey deeper into the Linux.
 
 ## Scripts
-- [hoodupdate.sh](Update.md)
-- [timerscript.sh](Timer.md)
-- [hoodsearch.sh](Search.md)
+#### hoodupdate.sh
+- I wanted a simple all in 1 command to update all my app repos such as `apt, flatpak, brew, snap` instead of manually stepping through 1 by 1. This script will read the `stores.txt` file, update the app stores listed there and then autoremove/autoclean them. *(Maybe in the future I'll extend this to be dynamic and get update commands from a text file as well)*
+	- Make sure to also grab the stores.txt file
+
+#### hoodsearch.sh
+- Another all in 1 script. I wanted to be able to search all my installed app stores, instead of manually doing it 1 by 1. This script in particular is a work in progress.
+```
+GOALS:
+1. Search all available app stores on the system using 1 command
+	- when you type in "find or search" 'x(name of app)' it'll go and search all the 
+	available stores that you have for that app and return 
+		- brew currently doesn't have 'x'
+		- flatpak found 'x'
+		- snap found 'x'
+  
+2. Ask the user which option they would like to download from 
+		- use the 0 - 10 whatever number selector whatever number they choose 
+		- it'll go ahead and run the right install command for that store
+
+3. Keep a log of installed apps and from where they were installed for easy back tracking/uninstalling
+```
+#### hoodtimer.sh
+- I wanted an easy to access timer. Something I can access "quick" and since I'm mostly in the terminal this was the obvious approach. 
+
+```
+Command syntax: 
+- `timer 10m` would start a 10 minute timer
+- `timer 10` would start a 10 second timer
+- `timer shutdown` starts the default 60 second shutdown timer, similar to running just `shutdown`
+```
+#### hoodyoink.sh
+- I just wanted a simple bash script that would sift through any folder I run it in,
+extract files that are images but don't have the appropiate file extensions and rename accordingly. 
+I also wanted to account for a specific file sizes in order to filter out thumbnails and the like.
+
+``` 
+Command syntax: yoink (or whatever alias)
+You will then be prompted and asked for size
+Size can be KB,MB,GB (case sensative) EG: 5MB
+```
 
 ## Requirements (tools the script uses):
 - grep

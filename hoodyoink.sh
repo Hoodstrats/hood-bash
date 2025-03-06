@@ -2,7 +2,7 @@
 
 # change the case statement to check for -ge instead of -lt and do the conversion
 function check_files() {
-  read -p "What size image would you like to search for? " RESPONSE
+  read -p "What size image would you like to search for? Can use:KB,MB,GB Eg:5MB " RESPONSE
   size=$(echo "$RESPONSE" | sed 's/[^0-9]*$//')
   unit=$(echo "$RESPONSE" | sed 's/[0-9]*//')
 
@@ -46,7 +46,7 @@ function check_files() {
   done
 }
 
-# TODO: check for duplicate files after conversion so like check their meta data
+# TODO: check for duplicate files after conversion through their meta data
 function convert_to_png() {
   # Check if the 'png_images' directory exists, if not, create it
   if [ ! -d png_images ]; then
