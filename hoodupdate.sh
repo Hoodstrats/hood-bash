@@ -26,15 +26,6 @@ function checkForInput() {
     checkStores
     sleep 2
     runUpdate
-  elif [ "$1" == "n" ]; then
-    echo -e "\n"
-    read -p "Would you like to search for an APP? (y/n) " RESPONSE
-    if [ "$RESPONSE" == "y" ]; then
-      ./hoodsearch.sh
-    else
-      echo -e "\e[31mOk. Guess not...\e[0m"
-      exit 1
-    fi
   else
     echo -e "\e[31mOk. Guess not...\e[0m"
     exit 1
