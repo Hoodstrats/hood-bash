@@ -136,12 +136,16 @@ function addCheckedStores() {
 }
 
 function chooseStore() {
-  echo -e "\e[32mChoose which store you would like to install the APP from:\e[0m"
   number=0
   for store in "${storesWithApps[@]}"; do
     echo "$number.$store"
     number=$((number + 1))
   done
+  if [[ $number -eq 0 ]]; then
+    echo -e "\e[31mNo stores found with the app\e[0m"
+    exit 1
+  fi
+  echo -e "\e[32mChoose which store you would like to install the APP from:\e[0m"
   echo -e "\e[32m"
   read -p "Which store would you like to download from? " storeNumber
   echo "You chose ${storesWithApps[$storeNumber]}..."
