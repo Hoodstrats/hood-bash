@@ -28,6 +28,7 @@ GOALS:
 ```
 #### hoodtimer.sh
 - I wanted an easy to access timer. Something I can access "quick" and since I'm mostly in the terminal this was the obvious approach. 
+    - added functionality for dunstify (need dunst installed)
 
 ```
 Command syntax: 
@@ -46,9 +47,20 @@ You will then be prompted and asked for size
 Size can be KB,MB,GB (case sensative) EG: 5MB
 ```
 
+#### hooddisplay.sh
+
+```
+(To get an example just run the command empty or pass in "example")
+Command syntax: set_display (or you're alias or ./hooddisplay.sh)
+set_diplay <display_port> <resolution> <refresh_rate>
+Example: ./hooddisplay.sh DisplayPort-2 1920x1080 60.00
+```
+
 ## Requirements (tools the script uses):
 - grep
 - cat
+- dunst (dunstify, if you want notifications for the timer) 
+- xrandr (for the display settings script)
 
 ## Installation: setting the different scripts System wide
 ### **Make the script executable**:

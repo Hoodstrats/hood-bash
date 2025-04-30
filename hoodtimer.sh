@@ -49,6 +49,7 @@ timer() {
         exit 1
     fi
     countdown
+    dunstify --urgency=normal "Timer expired!"
     echo -e "\nTime's up!"
 }
 countdown() {
