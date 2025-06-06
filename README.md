@@ -56,7 +56,17 @@ set_diplay <display_port> <resolution> <refresh_rate>
 Example: ./hooddisplay.sh DisplayPort-2 1920x1080 60.00
 ```
 
+#### hoodwatch.sh
+
+```
+Requires: streamlink and mpv
+Command syntax: watch (or whatever alias you choose)
+Example: watch hoodstrats 480p
+```
+
 ## Requirements (tools the script uses):
+- streamlink (for watch)
+- mpv (for watch)
 - grep
 - cat
 - dunst (dunstify, if you want notifications for the timer) 
