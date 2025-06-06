@@ -19,7 +19,7 @@ checkedStores=()
 searchCommands=(
   #apt can also use regular expressions with ^$ to match the exact name ex: apt search --names-only ^python3$
   "search --names-only"
-  #brew, snap
+  #brew, snap, cargo
   "search"
   #flatpak
   "search --columns=name"
@@ -29,7 +29,7 @@ storesWithApps=()
 
 #just incase we add more stores with different install commands
 installCommands=(
-  #apt,brew, snap, flatpak
+  #apt,brew, snap, flatpak, cargo
   "install"
 )
 
@@ -113,6 +113,16 @@ function searchStores() {
         echo "==============================="
         echo -e "\n"
         ;;
+      "cargo")
+        echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
+        search_output=$(cargo ${searchCommands[1]} "$RESPONSE")
+        #grep the search output for the exact name of the app
+        #using -i to ignore case and -w to match whole words
+        search_output=$(echo "$search_output" | grep -iw "$RESPONSE")
+        addCheckedStores "$store" "$search_output" "$RESPONSE"
+        echo "==============================="
+        echo -e "\n"
+        ;;
       *)
         echo -e "\e[32mStore not found...\e[0m"
         ;;
@@ -168,6 +178,9 @@ function installAPP() {
     ;;
   "flatpak")
     flatpak ${installCommands[0]} $1
+    ;;
+  "cargo")
+    cargo ${installCommands[0]} $1
     ;;
   *)
     echo -e "\e[32mStore not found...\e[0m"
