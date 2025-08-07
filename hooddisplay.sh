@@ -39,33 +39,48 @@ function set_display() {
     fi
 
     if [[ -z "$resolution" ]]; then
-        # Check if $2 is a valid resolution for the given display
-        if ! xrandr --query | grep -A20 "^$display_port" | awk '{print $1}' | grep -wq "$2"; then
+        echo "Resolution not provided."
+        echo "Available resolutions for $display_port:"
+        xrandr --query | grep -A20 "^$display_port" | awk '/^[ ]+[0-9]+x[0-9]+/ {print $1}'
+        exit 1
+    else
+        # Check if $resolution is valid for the given display
+        if ! xrandr --query | grep -A20 "^$display_port" | awk '/^[ ]+[0-9]+x[0-9]+/ {print $1}' | grep -wq "$resolution"; then
             echo "Invalid resolution: $resolution"
             echo "Available resolutions for $display_port:"
             xrandr --query | grep -A20 "^$display_port" | awk '/^[ ]+[0-9]+x[0-9]+/ {print $1}'
             exit 1
         fi
-        local res=$(xrandr | grep "*" | awk '{print $1}' | head -n 1)
-        resolution="$res"
-        echo "Resolution not provided, using default: $resolution"
     fi
 
     if [[ -z "$refresh_rate" ]]; then
         echo "Please provide a refresh rate. Example: 120.00"
         exit 1
     else
-        # Check if $3 is a valid refresh rate for the given display
-        if ! xrandr --query | grep -A20 "^$display_port" | awk '{print $1}' | grep -wq "$3"; then
+        # Check if $refresh_rate is valid for the given display and resolution
+        # using AWK to parse and extract the available refresh rates for the specified resolution
+        # making sure to strip any non-numeric characters before comparing
+        available_rates=$(xrandr --query | awk -v disp="$display_port" -v res="$resolution" '
+            $1 == disp {found=1; next}
+            found && $1 ~ /^[0-9]+x[0-9]+/ {
+                if ($1 == res) {
+                    for(i=2;i<=NF;i++) {
+                        gsub(/[^0-9.]/, "", $i)
+                        if($i != "") print $i
+                    }
+                } else {found=0}
+            }
+        ')
+        if ! echo "$available_rates" | grep -wq "$refresh_rate"; then
             echo "Invalid refresh rate: $refresh_rate"
-            echo "Available refresh rates for the current resolution $resolution:"
-            xrandr --query | grep -A20 "^$display_port" | awk -v res="$resolution" '$1 == res {for(i=2;i<=NF;i++) if($i ~ /^[0-9.]+$/) print $i}'
+            echo "Available refresh rates for $display_port at $resolution:"
+            echo "$available_rates"
             exit 1
         fi
     fi
 
     # Set the monitor settings using xrandr
-    xrandr --output "$display" --mode "$resolution" --rate "$refresh_rate"
+    xrandr --output "$display_port" --mode "$resolution" --rate "$refresh_rate"
     if [ $? -ne 0 ]; then
         echo "Failed to set monitor settings. Please check the display port and resolution."
         exit 1
