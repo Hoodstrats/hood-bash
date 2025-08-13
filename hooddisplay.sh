@@ -3,12 +3,12 @@
 # It configures the display resolution, refresh rate, and other settings using xrandr.
 # tested on a 1 monitor setup
 
-function set_display() {
+function settings() {
     # this is the display name, e.g., HDMI-1, DP-1, etc get these from running xrandr.
     # for example mine is DisplayPort-2
-    local display_port="$1"
-    local resolution="$2"
-    local refresh_rate="$3"
+    local display_port="$2"
+    local resolution="$3"
+    local refresh_rate="$4"
 
     # Check if xrandr is installed
     if ! command -v xrandr &>/dev/null; then
@@ -17,8 +17,8 @@ function set_display() {
     fi
 
     if [[ -z "$display_port" ]] && [[ -z "$resolution" ]] && [[ -z "$refresh_rate" ]]; then
-        echo "Usage: $0 <display_port> <resolution> <refresh_rate>"
-        echo "Example: $0 DisplayPort-2 1920x1080 60.00"
+        echo "Usage: $0 --s <display_port> <resolution> <refresh_rate>"
+        echo "Example: $0 --s DisplayPort-2 1920x1080 60.00"
         exit 1
     fi
 
@@ -88,4 +88,40 @@ function set_display() {
     echo "Monitor settings updated successfully: $display_port $resolution $refresh_rate"
 }
 
-set_display "$@"
+function monitors() {
+    # Show all connected displays with their port, current resolution, and refresh rate
+    xrandr --query | awk '
+        /^[^ ]+ connected/ {
+            display=$1
+            # Find the current mode and refresh rate marked with "*"
+            while (getline && $1 ~ /^[ ]*[0-9]+x[0-9]+/) {
+                res=$1
+                for(i=2;i<=NF;i++) {
+                    if ($i ~ /\*/) {
+                        rate=$i
+                        gsub(/[^0-9.]/, "", rate)
+                        print display, res, rate
+                        break
+                    }
+                }
+                if (rate != "") break
+            }
+            rate=""
+        }
+    '
+}
+function help(){
+        echo "Usage: $0 --s <display_port> <resolution> <refresh_rate>"
+        echo "Example: $0 --s DisplayPort-2 1920x1080 60.00"
+        exit 1
+}
+
+if [ "$1" == "--monitors" ] || [ "$1" == "--m" ]; then
+    monitors
+elif [ "$1" == "--help" ] || [ "$1" == "--h" ]; then
+    help
+elif  [ "$1" == "--settings" ] || [ "$1" == "--s" ] || [ "$1" == "--set" ]; then
+    settings "$@"
+else
+    help
+fi

@@ -50,10 +50,10 @@ Size can be KB,MB,GB (case sensative) EG: 5MB
 #### hooddisplay.sh
 
 ```
-(To get an example just run the command empty or pass in "example")
-Command syntax: set_display (or you're alias or ./hooddisplay.sh)
-set_diplay <display_port> <resolution> <refresh_rate>
-Example: ./hooddisplay.sh DisplayPort-2 1920x1080 60.00
+(To get an example just run the command empty or pass in --h)
+Command syntax: display (or you're alias or ./hooddisplay.sh)
+display --s <display_port> <resolution> <refresh_rate>
+Example: ./hooddisplay.sh --s DisplayPort-2 1920x1080 60.00
 ```
 
 #### hoodwatch.sh
