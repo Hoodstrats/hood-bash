@@ -91,8 +91,12 @@ function runClean() {
   echo -e "Doing some house keeping...\n"
 
   echo -e "Cleaning up APT...\n"
-  sudo apt auto-remove -y
-  sudo apt autoclean
+  # Use the correct apt subcommand 'autoremove' if on linux mint
+  if ! sudo apt auto-remove -y; then
+    echo "apt auto-remove failed, running apt autoremove as fallback..."
+    sudo apt autoremove -y
+  fi
+    sudo apt autoclean -y
   sleep 1
   echo -e "==============================="
 
