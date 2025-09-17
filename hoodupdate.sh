@@ -20,16 +20,9 @@ echo -e "\e[0m"
 
 #add another choice and run the hoodsearch bash script if they choose it
 function checkForInput() {
-  #this is the first argument passed to the function
-  local args=$1
-  if [ "$1" == "y" ]; then
-    checkStores
-    sleep 2
-    runUpdate
-  else
-    echo -e "\e[31mOk. Guess not...\e[0m"
-    exit 1
-  fi
+  checkStores
+  sleep 1
+  runUpdate
 }
 
 function checkStores() {
@@ -41,7 +34,9 @@ function checkStores() {
       echo -e "\e[31m$store is not installed\e[0m"
     fi
   done
+  echo -e "\e[32m"
   echo "==============================="
+  echo -e "\e[0m"
 }
 
 function runUpdate() {
@@ -58,13 +53,17 @@ function runUpdate() {
     sudo apt upgrade -y
   fi
   sleep 1
+  echo -e "\e[32m"
   echo "==============================="
+  echo -e "\e[0m"
   if [ -x "$(command -v flatpak)" ]; then
     echo -e "Checking for Flatpak updates...\n"
     flatpak update
   fi
   sleep 1
+  echo -e "\e[32m"
   echo "==============================="
+  echo -e "\e[0m"
   #check if the user has brew installed
   if [ -x "$(command -v brew)" ]; then
     echo -e "Checking for brew updates...\n"
@@ -77,19 +76,24 @@ function runUpdate() {
     fi
   fi
   sleep 1
+  echo -e "\e[32m"
   echo "==============================="
+  echo -e "\e[0m"
   if [ -x "$(command -v snap)" ]; then
     echo -e "Checking for Snap updates...\n"
     sudo snap refresh
   fi
+  echo -e "\e[32m"
   echo -e "\nAll updates have been checked for and installed."
+  echo -e "\e[0m"
   runClean
 }
 
 function runClean() {
-  echo -e "==============================="
+  echo -e "\e[32m"
+  echo "==============================="
+  echo -e "\e[0m"
   echo -e "Doing some house keeping...\n"
-
   echo -e "Cleaning up APT...\n"
   # Use the correct apt subcommand 'autoremove' if on linux mint
   if ! sudo apt auto-remove -y; then
@@ -98,7 +102,9 @@ function runClean() {
   fi
     sudo apt autoclean -y
   sleep 1
-  echo -e "==============================="
+  echo -e "\e[32m"
+  echo "==============================="
+  echo -e "\e[0m"
 
   if [ -x "$(command -v flatpak)" ]; then
     echo -e "Cleaning up Flatpak...\n"
@@ -106,7 +112,9 @@ function runClean() {
   fi
 
   sleep 1
+  echo -e "\e[32m"
   echo "==============================="
+  echo -e "\e[0m"
 
   if [ -x "$(command -v brew)" ]; then
     echo -e "Cleaning up Brew...\n"
@@ -114,11 +122,7 @@ function runClean() {
   fi
 
   sleep 1
-  echo "==============================="
-  echo -e "\nJobs done, exiting script!"
-  sleep 1
+  echo -e "Jobs done, exiting script!"
   exit 1
 }
-
-read -p "Yo, you want to check for updates? (y/n) " RESPONSE
-checkForInput $RESPONSE
+checkForInput
