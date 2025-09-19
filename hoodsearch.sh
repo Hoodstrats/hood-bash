@@ -42,8 +42,8 @@ APP_NAME=""
 #set the color of the text to bright green
 echo -e "\e[32m"
 echo "==============================="
-echo "Hoodstrats Search Utility v1.0"
-echo "==============================="
+echo -e "\e[31mHoodstrats Search Utility v1.0\e[0m"
+echo -e "\e[32m==============================="
 echo -e "\e[0m"
 
 #just to make sure there's internet available period
@@ -85,10 +85,15 @@ function searchStores() {
       "apt")
         echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
         # sudo apt ${searchCommands[0]} "^$RESPONSE$"
-        search_output=$(apt ${searchCommands[0]} "^$RESPONSE"'$')
+        # 2>&1 to capture stderr in case --names-only is not supported
+        search_output=$(apt ${searchCommands[0]} "^$RESPONSE"'$' 2>&1)
+        if echo "$search_output" | grep -q "unrecognized option '--names-only'"; then
+          echo -e "\e[31m'--names-only' not supported, retrying without it...\e[0m"
+          # still uses the ^$ to match the exact name of the app regardless of not having the --names-only flag
+          search_output=$(apt search "^$RESPONSE"'$')
+        fi
         addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
-        echo -e "\n"
         ;;
 
       "brew")
@@ -96,7 +101,6 @@ function searchStores() {
         search_output=$(brew ${searchCommands[1]} "/^$RESPONSE/")
         addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
-        echo -e "\n"
         ;;
       "flatpak")
         echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
@@ -106,7 +110,6 @@ function searchStores() {
         search_output=$(echo "$search_output" | grep -iw "$RESPONSE")
         addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
-        echo -e "\n"
         ;;
 
       "snap")
@@ -114,7 +117,6 @@ function searchStores() {
         search_output=$(snap ${searchCommands[1]} "$RESPONSE")
         addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
-        echo -e "\n"
         ;;
       "cargo")
         echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
@@ -124,7 +126,6 @@ function searchStores() {
         search_output=$(echo "$search_output" | grep -iw "$RESPONSE")
         addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
-        echo -e "\n"
         ;;
       *)
         echo -e "\e[32mStore not found...\e[0m"
@@ -168,7 +169,6 @@ function chooseStore() {
 
 function installAPP() {
   echo -e "\e[32mAttempting to install $1 from $2...\e[0m"
-  echo -e "\n"
   case $2 in
   "apt")
     sudo apt ${installCommands[0]} $1
@@ -189,27 +189,30 @@ function installAPP() {
     echo -e "\e[32mStore not found...\e[0m"
     ;;
   esac
-  echo -e "\n"
   # store this info right here into a text file or the stores text
   echo -e "\e[32m$1 has been installed from $2...\e[0m"
   # print the installed info to file
   # using >> instead > APPENDS to file and doesn't overwrite it
   printf "%s\n" "$1 from $2" >>installed.txt
 
-  echo -e "\nJobs done, exiting script!"
+  echo -e "\e[32m\nJobs done, exiting script!\e[0m"
   exit 1
 }
 
 how_to()
 {
-  echo -e "\e[31mError: no app name provided after your alias/.hoodsearch.sh\e[0m"
+  echo -e "\e[33mUsage: hoodsearch.sh [app-name]\e[0m"
+  echo -e "\e[33mExample: hoodsearch.sh firefox\e[0m"
+  echo -e "\e[33mThis will search all installed package managers for the app and give you the option to install it from one of them.\e[0m"
   echo -e "\e[33mIf you would like to see a list of installed apps use alias + --installed or -i\e[0m"
-  echo -e "\e[33mExample: hoodsearch.sh firefox or hoodsearch.sh -i\e[0m"
+  echo -e "\e[33mExample: hoodsearch.sh -i\e[0m"
 }
 #check to see if the response is one of the flags
 if [[ "$1" == "--installed" || "$1" == "-i" ]]; then
   echo -e "\e[32mList of apps installed using this tool:\e[0m"
   cat installed.txt
+elif [[ "$1" == "--help" || "$1" == "-h" ]]; then
+  how_to
 elif [[ -n "$1" ]]; then
   APP_NAME="$1"
   check_internet
