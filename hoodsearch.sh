@@ -36,6 +36,9 @@ installCommands=(
 #get stores from a text file within the same directory seperated by new lines
 mapfile -t stores <./stores.txt
 
+# the app name to search for
+APP_NAME=""
+
 #set the color of the text to bright green
 echo -e "\e[32m"
 echo "==============================="
@@ -74,7 +77,7 @@ function checkStores() {
 # TODO:extend this to account for whether or not the user passed in -b flag
 # if -b flag is passed in then remove specific search
 function searchStores() {
-  read -p "What APP would you like to search for? " RESPONSE
+  RESPONSE=$APP_NAME
   #search each available store for the app
   for store in "${checkedStores[@]}"; do
     if [ -x "$(command -v $store)" ]; then
@@ -197,10 +200,19 @@ function installAPP() {
   exit 1
 }
 
+how_to()
+{
+  echo -e "\e[31mError: no app name provided after your alias/.hoodsearch.sh\e[0m"
+  echo -e "\e[33mIf you would like to see a list of installed apps use alias + --installed or -i\e[0m"
+  echo -e "\e[33mExample: hoodsearch.sh firefox or hoodsearch.sh -i\e[0m"
+}
 #check to see if the response is one of the flags
-if [[ "$1" == "-installed" || "$1" == "-i" ]]; then
+if [[ "$1" == "--installed" || "$1" == "-i" ]]; then
   echo -e "\e[32mList of apps installed using this tool:\e[0m"
   cat installed.txt
-else
+elif [[ -n "$1" ]]; then
+  APP_NAME="$1"
   check_internet
+else 
+  how_to 
 fi
