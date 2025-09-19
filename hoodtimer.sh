@@ -31,6 +31,8 @@ check() {
         TIME=60
         countdown
         shutdown 0
+    elif [[ $VALUE == "--help" || $VALUE == "-h" ]]; then
+        usage
     else
         timer
     fi
@@ -53,7 +55,6 @@ timer() {
     echo -e "\nTime's up!"
 }
 countdown() {
-    echo "Timer starting..."
     local total_time=$TIME
     while [ $total_time -gt 0 ]; do
         # Display remaining time in the selected UNIT
