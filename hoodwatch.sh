@@ -5,11 +5,11 @@
 function watch() {
   #if argument #2 is nil then we try 480p straight up
   if [ -z "$2" ]; then
-    streamlink -p mpv --twitch-disable-ads twitch.tv/"$1" 480p
+    streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 480p
   elif [ "$2" != null ]; then
-    streamlink -p mpv --twitch-disable-ads twitch.tv/"$1" "$2"
+    streamlink -p mpv --twitch-low-latency twitch.tv/"$1" "$2"
   else
-    streamlink -p mpv --twitch-disable-ads twitch.tv/"$1" best
+    streamlink -p mpv --twitch-low-latency twitch.tv/"$1" best
   fi
 }
 
