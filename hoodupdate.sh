@@ -53,6 +53,9 @@ function runUpdate() {
     sudo apt upgrade -y
   fi
   sleep 1
+  echo -e "\e[32m"
+  echo "==============================="
+  echo -e "\e[0m"
   if [ -x "$(command -v flatpak)" ]; then
     echo -e "Checking for Flatpak updates...\n"
     flatpak update
