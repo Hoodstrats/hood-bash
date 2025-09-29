@@ -34,9 +34,7 @@ function checkStores() {
       echo -e "\e[31m$store is not installed\e[0m"
     fi
   done
-  echo -e "\e[32m"
-  echo "==============================="
-  echo -e "\e[0m"
+  echo -e "\e[32m =============================== \e[0m"
 }
 
 function runUpdate() {
@@ -93,12 +91,15 @@ function runClean() {
   echo -e "\e[32m"
   echo "==============================="
   echo -e "\e[0m"
-  echo -e "Doing some house keeping...\n"
-  echo -e "Cleaning up APT...\n"
+  echo -e "\e[33mDoing some house keeping...\e[0m"
+  echo -e "\e[33mCleaning up APT...\e[0m"
   # Use the correct apt subcommand 'autoremove' if on linux mint
-  if ! sudo apt auto-remove -y; then
-    echo "apt auto-remove failed, running apt autoremove as fallback..."
+  output=$(sudo apt auto-remove -y 2>&1)
+  if [[ $output == *"Linux Mint"* ]]; then
+    echo -e "\e[33mDetected Linux Mint, running apt autoremove...\e[0m"
     sudo apt autoremove -y
+  else
+    sudo apt auto-remove -y
   fi
     sudo apt autoclean -y
   sleep 1
