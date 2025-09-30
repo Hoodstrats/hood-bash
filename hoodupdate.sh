@@ -34,7 +34,7 @@ function checkStores() {
       echo -e "\e[31m$store is not installed\e[0m"
     fi
   done
-  echo -e "\e[32m =============================== \e[0m"
+  echo -e "\e[32m===============================\e[0m"
 }
 
 function runUpdate() {

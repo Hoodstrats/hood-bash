@@ -36,7 +36,7 @@ function youtube(){
     else
       echo "No quality specified, defaulting to 480p."
       sleep 1
-      echo "$output"
+      streamlink -p mpv https://www.youtube.com/@"$1" 480p
     fi
   elif [ "$2" != null ]; then
     echo -e "\e[32mTrying $1 at $2...\e[0m"
@@ -73,7 +73,7 @@ function twitch(){
     else
       echo "No quality specified, defaulting to 480p."
       sleep 1
-      echo "$output"
+      streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 480p 
     fi
   elif [ "$2" != null ]; then
     echo -e "\e[32mTrying $1 at $2...\e[0m"
@@ -109,7 +109,7 @@ function kick() {
     else
       echo "No quality specified, defaulting to 480p."
       sleep 1
-      echo "$output"
+      streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 480p
     fi
   elif [ "$2" != null ]; then
     echo -e "\e[32mTrying $1 at $2...\e[0m"

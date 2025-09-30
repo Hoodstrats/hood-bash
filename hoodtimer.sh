@@ -3,19 +3,6 @@
 #= @hoodstrats on all socials  =#
 #===============================#
 
-# Function to display how to use the command
-usage() {
-    echo "Usage: timer <minutes(m)|seconds(s)>"
-    echo "Can also be used to give the 'shutdown' command a timer"
-    echo "eg: timer shutdown (defaults to 60 seconds)"
-    exit 1
-}
-
-# Check if the correct number of arguments is provided (no less than)
-if [ "$#" -ne 1 ]; then
-    usage
-fi
-
 # Get the number of minutes from the argument
 VALUE=$1
 # parse the input using sed to check whether or not they want minutes or seconds
@@ -52,7 +39,7 @@ timer() {
     fi
     countdown
     dunstify --urgency=normal "Timer expired!"
-    echo -e "\nTime's up!"
+    echo -e "\e[31m\nTime's up!"
 }
 countdown() {
     local total_time=$TIME
@@ -62,15 +49,27 @@ countdown() {
             #kind of what we do in game dev
             mins=$(($total_time / 60))
             secs=$(($total_time % 60))
-            echo -ne "Time remaining: $mins minutes and $secs seconds\r"
+            echo -ne "\r\033[KTime remaining: $mins minutes and $secs seconds"
         else
-            echo -ne "Time remaining: $total_time seconds\r"
+            echo -ne "\r\033[KTime remaining: $total_time seconds"
+            if [ $total_time -le $((TIME / 2)) ]; then
+                echo -ne "\e[33m" # Set text color to yellow
+            else
+                echo -ne "\e[32m" # Set text color to green
+            fi
         fi
         # Sleep for one second
         sleep 1
         # Decrement the counter
         total_time=$(($total_time - 1))
     done
+}
+# Function to display how to use the command
+usage() {
+    echo "Usage: timer <minutes(m)|seconds(s)>"
+    echo "Can also be used to give the 'shutdown' command a timer"
+    echo "eg: timer shutdown (defaults to 60 seconds)"
+    exit 1
 }
 
 # Start the timer
