@@ -18,11 +18,29 @@ check() {
         TIME=60
         countdown
         shutdown 0
-    elif [[ $VALUE == "--help" || $VALUE == "-h" ]]; then
+    elif [[ $VALUE == "-h" || $VALUE == "--help" ]]; then
         usage
+    elif [[ $VALUE == "-s" || $VALUE == "--stopwatch" ]]; then
+        stopwatch
     else
         timer
     fi
+}
+stopwatch() {
+    echo "Stopwatch started. Press any key to stop."
+    local elapsed=0
+    while true; do
+        mins=$(($elapsed / 60))
+        secs=$(($elapsed % 60))
+        echo -ne "\r\033[K$mins minutes and $secs seconds"
+        sleep 1
+        elapsed=$(($elapsed + 1))
+        if read -t 0.1 -n 1; then
+            break
+        fi
+    done
+    echo -e "\nElapsed time: $mins minutes and $secs seconds."
+    exit 0
 }
 # Function to handle timer expiration
 timer() {
@@ -69,6 +87,8 @@ usage() {
     echo "Usage: timer <minutes(m)|seconds(s)>"
     echo "Can also be used to give the 'shutdown' command a timer"
     echo "eg: timer shutdown (defaults to 60 seconds)"
+    echo "Or use it as a stopwatch with -s or --stopwatch"
+    echo "Press any key to stop it"
     exit 1
 }
 
