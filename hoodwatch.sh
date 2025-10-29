@@ -28,35 +28,38 @@ function youtube(){
   
   if [ -z "$2" ]; then
     echo -e "\e[32mTrying $1 at 480p...\e[0m"
-    output=$(streamlink -p mpv https://www.youtube.com/@"$1" 480p)
-    if [[ $output == *"playable"* ]] || [[ $output == *"protected"* ]]; then
-      echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
-      exit 1
-    fi
-    if [[ $output == *"error"* ]]; then
-      echo -e "\e[31m480p not available, trying default 720p60...\e[0m"
-      streamlink -p mpv https://www.youtube.com/@"$1" 720p60
-      if [[ $output == *"error"* ]]; then
-        echo -e "\e[31m720p60 not available, trying best quality...\e[0m"
+    check_output=$(streamlink --stream-url https://www.youtube.com/@"$1" 480p 2>&1)
+    if [[ $check_output == *"error"* ]] || [[ $check_output == *"playable"* ]]; then
+      echo -e "\e[31m480p not available, trying default 720p...\e[0m"
+      check_output=$(streamlink --stream-url https://www.youtube.com/@"$1" 720p 2>&1)
+      if [[ $check_output == *"error"* ]] || [[ $check_output == *"playable"* ]]; then
+        echo -e "\e[31m720p not available, trying best quality...\e[0m"
+        check_output=$(streamlink --stream-url https://www.youtube.com/@"$1" best 2>&1)
+      if [[ $check_output == *"error"* ]] || [[ $check_output == *"playable"* ]]; then
+        echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
+        exit 1
+      else
         streamlink -p mpv https://www.youtube.com/@"$1" best
       fi
-    else
-      echo "No quality specified, defaulting to 480p."
-      sleep 1
+      else
+        streamlink -p mpv https://www.youtube.com/@"$1" 720p
+      fi
+      else
       streamlink -p mpv https://www.youtube.com/@"$1" 480p
     fi
   elif [ "$2" != null ]; then
     echo -e "\e[32mTrying $1 at $2...\e[0m"
-    output=$(streamlink -p mpv https://www.youtube.com/@"$1" "$2")
-    if [[ $output == *"playable"* ]]; then
+    check_output=$(streamlink --stream-url https://www.youtube.com/@"$1" "$2" 2>&1)
+    if [[ $check_output == *"playable"* ]]; then
       echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
       exit 1
     fi
-    if [[ $output == *"error"* ]]; then
+    if [[ $check_output == *"error"* ]]; then
       echo -e "\e[31m$2 not available, try one of the resolutions listed below...\e[0m"
-      echo "$output"
+      echo "$check_output"
       exit 1
     fi
+    streamlink -p mpv https://www.youtube.com/@"$1" "$2"
   fi
 }
 
@@ -65,39 +68,41 @@ function twitch(){
     echo "Please provide a Twitch channel name."
     exit 1
   fi
-  #if argument #2 is nil then we try 480p straight up
+  #if argument #2 is nil try to default to 480p then cycle through other resolutions then try best
   if [ -z "$2" ]; then
     echo -e "\e[32mTrying $1 at 480p...\e[0m"
-    output=$(streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 480p)
-    if [[ $output == *"playable"* ]]; then
-      echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
-      exit 1
-    fi
-    # check if output contains "error"
-    if [[ $output == *"error"* ]]; then
+    check_output=$(streamlink --stream-url twitch.tv/"$1" 480p 2>&1)
+    if [[ $check_output == *"error"* ]] || [[ $check_output == *"playable"* ]]; then
       echo -e "\e[31m480p not available, trying default 720p60...\e[0m"
-      streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 720p60
-      if [[ $output == *"error"* ]]; then
+      check_output=$(streamlink --stream-url twitch.tv/"$1" 720p60 2>&1)
+      if [[ $check_output == *"error"* ]] || [[ $check_output == *"playable"* ]]; then
         echo -e "\e[31m720p60 not available, trying best quality...\e[0m"
-        streamlink -p mpv --twitch-low-latency twitch.tv/"$1" best
+        check_output=$(streamlink --stream-url twitch.tv/"$1" best 2>&1)
+        if [[ $check_output == *"error"* ]] || [[ $check_output == *"playable"* ]]; then
+          echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
+          exit 1
+        else
+          streamlink -p mpv --twitch-low-latency twitch.tv/"$1" best
+        fi
+      else
+        streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 720p60
       fi
     else
-      echo "No quality specified, defaulting to 480p."
-      sleep 1
-      streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 480p 
+      streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 480p
     fi
   elif [ "$2" != null ]; then
     echo -e "\e[32mTrying $1 at $2...\e[0m"
-    output=$(streamlink -p mpv --twitch-low-latency twitch.tv/"$1" "$2")
-    if [[ $output == *"playable"* ]]; then
+    check_output=$(streamlink --stream-url twitch.tv/"$1" "$2" 2>&1)
+    if [[ $check_output == *"playable"* ]]; then
       echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
       exit 1
     fi
-    if [[ $output == *"error"* ]]; then
+    if [[ $check_output == *"error"* ]]; then
       echo -e "\e[31m$2 not available, try one of the resolutions listed below...\e[0m"
-      echo "$output"
+      echo "$check_output"
       exit 1
     fi
+    streamlink -p mpv --twitch-low-latency twitch.tv/"$1" "$2"
   fi
 }
 function kick() {
@@ -105,31 +110,32 @@ function kick() {
     echo "Please provide a Kick channel name."
     exit 1
   fi
-  #if argument #2 is nil then we try 480p straight up
+  #if argument #2 is nil try to default to 480p then cycle through other resolutions then try best
   if [ -z "$2" ]; then
     echo -e "\e[32mTrying $1 at 480p...\e[0m"
-    output=$(streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 480p)
-    if [[ $output == *"playable"* ]]; then
-      echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
-      exit 1
-    fi
-    # check if output contains "error"
-    if [[ $output == *"error"* ]]; then
-      echo -e "\e[31m480p not available, trying default 720p60...\e[0m"
-      streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 720p60
-      if [[ $output == *"error"* ]]; then
+    check_output=$(streamlink --stream-url https://www.kick.com/"$1" 480p 2>&1)
+    if [[ $check_output == *"error"* ]] || [[ $check_output == *"playable"* ]]; then
+      echo -e "\e[31m480p not available, trying 720p60...\e[0m"
+      check_output=$(streamlink --stream-url https://www.kick.com/"$1" 720p60 2>&1)
+      if [[ $check_output == *"error"* ]] || [[ $check_output == *"playable"* ]]; then
         echo -e "\e[31m720p60 not available, trying best quality...\e[0m"
-        streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" best
+        check_output=$(streamlink --stream-url https://www.kick.com/"$1" best 2>&1)
+        if [[ $check_output == *"error"* ]] || [[ $check_output == *"playable"* ]]; then
+          echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
+          exit 1
+        else
+          streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" best
+        fi
+      else
+        streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 720p60
       fi
     else
-      echo "No quality specified, defaulting to 480p."
-      sleep 1
       streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 480p
     fi
   elif [ "$2" != null ]; then
     echo -e "\e[32mTrying $1 at $2...\e[0m"
-    output=$(streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" "$2")
-    if [[ $output == *"playable"* ]]; then
+    check_output=$(streamlink --stream-url https://www.kick.com/"$1" "$2" 2>&1)
+    if [[ $check_output == *"playable"* ]]; then
       echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
       exit 1
     fi
@@ -138,6 +144,7 @@ function kick() {
       echo "$output"
       exit 1
     fi
+    streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" "$2"
   fi
 }
 function help() {
@@ -152,7 +159,7 @@ function help() {
   echo -e "\e[31mNOTE: YouTube requires the channels actual @name not display name\e[0m\n"
   echo "Usage: hoodwatch.sh -<platform> <channel> [quality]"
   echo "Example: hoodwatch.sh -t ninja 720p"
-  echo "If quality is not specified, it tries 480p."
+  echo "If quality is not specified, it tries 480p, 720p, and finally best available"
   exit 0
 }
 
