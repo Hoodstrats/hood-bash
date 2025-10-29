@@ -3,6 +3,9 @@
 #= @hoodstrats on all socials  =#
 #===============================#
 
+# Handle Ctrl+C gracefully
+trap "echo -e \"\e[31mClosing stream safely so this doesn't randomly run again...\e[0m\"; exit 130" SIGINT
+
 function watch() {
   if [ "$1" == "-y" ] || [ "$1" == "--youtube" ]; then
     youtube "$2" "$3"
@@ -31,8 +34,12 @@ function youtube(){
       exit 1
     fi
     if [[ $output == *"error"* ]]; then
-      echo -e "\e[31m480p not available, trying best quality...\e[0m"
-      streamlink -p mpv https://www.youtube.com/@"$1" best
+      echo -e "\e[31m480p not available, trying default 720p60...\e[0m"
+      streamlink -p mpv https://www.youtube.com/@"$1" 720p60
+      if [[ $output == *"error"* ]]; then
+        echo -e "\e[31m720p60 not available, trying best quality...\e[0m"
+        streamlink -p mpv https://www.youtube.com/@"$1" best
+      fi
     else
       echo "No quality specified, defaulting to 480p."
       sleep 1
@@ -68,8 +75,12 @@ function twitch(){
     fi
     # check if output contains "error"
     if [[ $output == *"error"* ]]; then
-      echo -e "\e[31m480p not available, trying best quality...\e[0m"
-      streamlink -p mpv --twitch-low-latency twitch.tv/"$1" best
+      echo -e "\e[31m480p not available, trying default 720p60...\e[0m"
+      streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 720p60
+      if [[ $output == *"error"* ]]; then
+        echo -e "\e[31m720p60 not available, trying best quality...\e[0m"
+        streamlink -p mpv --twitch-low-latency twitch.tv/"$1" best
+      fi
     else
       echo "No quality specified, defaulting to 480p."
       sleep 1
@@ -104,8 +115,12 @@ function kick() {
     fi
     # check if output contains "error"
     if [[ $output == *"error"* ]]; then
-      echo -e "\e[31m480p not available, trying best quality...\e[0m"
-      streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" best
+      echo -e "\e[31m480p not available, trying default 720p60...\e[0m"
+      streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 720p60
+      if [[ $output == *"error"* ]]; then
+        echo -e "\e[31m720p60 not available, trying best quality...\e[0m"
+        streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" best
+      fi
     else
       echo "No quality specified, defaulting to 480p."
       sleep 1
