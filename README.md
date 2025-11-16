@@ -5,11 +5,24 @@ This is an ever growing collection of Bash scripts I've made and use myself.
 There might be other scripts out there that do the same thing but I decided to make my own in order to practice some Bash scripting, as I continue my journey deeper into the Linux.
 
 ## Scripts
-#### hoodupdate.sh
+#### hood_steam.sh
+- I was tired of looking up the game store appids in order to clean up any leftover files and folders when I uninstalled them. 
+    - RUN THIS SCRIPT FIRST with the delete [-d] flag and type in the game name not case-sensitive
+    this will clean up the folders in compatdata and shadercache
+    - you still have to manually run the uninstall from within steam AFTER DOING THE SCRIPT PART 
+- running it with list [-l] flag will simply list all the steam games you currently have installed and create a installed_games.db file within the script's directory
+```
+#NOTE: MAKE SURE TO CHANGE LINE 12 WITH YOUR STEAMAPPS LOCATION 
+
+Usage: locate or delete Steam games installed on your system."
+[-l] locate - List all installed Steam games with their appid and name."
+[-d] delete - Delete a specified Steam game by name (not case-sensitive)"
+```
+#### hood_update.sh
 - I wanted a simple all in 1 command to update all my app repos such as `apt, flatpak, brew, snap` instead of manually stepping through 1 by 1. This script will read the `stores.txt` file, update the app stores listed there and then autoremove/autoclean them. *(Maybe in the future I'll extend this to be dynamic and get update commands from a text file as well)*
 	- Make sure to also grab the stores.txt file
 
-#### hoodsearch.sh
+#### hood_search.sh
 - Another all in 1 script. I wanted to be able to search all my installed app stores, instead of manually doing it 1 by 1. This script in particular is a work in progress.
 ```
 GOALS:
@@ -26,7 +39,7 @@ GOALS:
 
 3. Keep a log of installed apps and from where they were installed for easy back tracking/uninstalling
 ```
-#### hoodtimer.sh
+#### hood_timer.sh
 - I wanted an easy to access timer. Something I can access "quick" and since I'm mostly in the terminal this was the obvious approach. 
     - added functionality for dunstify (need dunst installed)
 
@@ -36,7 +49,7 @@ Command syntax:
 - `timer 10` would start a 10 second timer
 - `timer shutdown` starts the default 60 second shutdown timer, similar to running just `shutdown`
 ```
-#### hoodyoink.sh
+#### hood_yoink.sh
 - I just wanted a simple bash script that would sift through any folder I run it in,
 extract files that are images but don't have the appropiate file extensions and rename accordingly. 
 I also wanted to account for a specific file sizes in order to filter out thumbnails and the like.
@@ -47,16 +60,16 @@ You will then be prompted and asked for size
 Size can be KB,MB,GB (case sensative) EG: 5MB
 ```
 
-#### hooddisplay.sh
+#### hood_display.sh
 
 ```
 (To get an example just run the command empty or pass in --h)
-Command syntax: display (or you're alias or ./hooddisplay.sh)
+Command syntax: display (or you're alias or ./hood_display.sh)
 display --s <display_port> <resolution> <refresh_rate>
-Example: ./hooddisplay.sh --s DisplayPort-2 1920x1080 60.00
+Example: ./hood_display.sh --s DisplayPort-2 1920x1080 60.00
 ```
 
-#### hoodwatch.sh
+#### hood_watch.sh
 
 ```
 Requires: streamlink and mpv
@@ -64,7 +77,7 @@ Command syntax: watch (or whatever alias you choose)
 Example: watch hoodstrats 480p
 ```
 
-## Requirements (tools the script uses):
+## Requirements (tools some the scripts use):
 - streamlink (for watch)
 - mpv (for watch)
 - grep

@@ -1,4 +1,7 @@
 #!/bin/bash
+#===============================#
+#= @hoodstrats on all socials  =#
+#===============================#
 # This script is used to set up the monitor settings for a Linux system.
 # It configures the display resolution, refresh rate, and other settings using xrandr.
 # tested on a 1 monitor setup
