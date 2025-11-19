@@ -12,6 +12,9 @@ cd "$(dirname "$0")"
 ACF_DIR="/home/$USER/.steam/debian-installation/steamapps"
 DATA_DIR="compatdata"
 SHADER_DIR="shadercache"
+INSTALL_DIR="common"
+# this is where the save files and some config files are stored for the games
+USER_DATA_DIR="/home/$USER/.steam/debian-installation/userdata"
 
 # the fields we're looking for in the acf files
 FIELD1="appid"
@@ -58,14 +61,20 @@ delete(){
       if [[ "${name,,}" == *"${del,,}"* ]]; then
             echo -e "\e[31mDeleting game: $name (AppID: $appid)\e[0m"
 
-          # remove the dirs under compatdata and shadercache 
-          for data_dir in "$ACF_DIR/$DATA_DIR" "$ACF_DIR/$SHADER_DIR"; do
+          # remove the dirs under compatdata and shadercache
+          for data_dir in "$ACF_DIR/$DATA_DIR" "$ACF_DIR/$SHADER_DIR" "$USER_DATA_DIR" "$ACF_DIR/$INSTALL_DIR"; do
             if [ -d "$data_dir" ]; then
-              rm -rf "$data_dir/$appid"
-              echo -e "\e[31mRemoved $data_dir/$appid.\e[0m"
+              if [ -e "$data_dir/$appid" ] || [ -L "$data_dir/$appid" ]; then
+                rm -rf "$data_dir/$appid"
+                echo -e "\e[31mRemoved $data_dir/$appid\e[0m"
+              fi
+              if [ -e "$data_dir/$name" ] || [ -L "$data_dir/$name" ]; then
+                rm -rf "$data_dir/$name"
+                echo -e "\e[31mRemoved $data_dir/$name\e[0m"
+              fi
             fi
           done
-          echo -e "\e[31mRemoved appid $appid from compatdata/shadercache and library folders.\e[0m"
+          echo -e "\e[31mRemoved appid $appid from compatdata/shadercache and library folders\e[0m"
       fi
   done
   # regenerate the game database
