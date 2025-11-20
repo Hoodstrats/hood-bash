@@ -62,7 +62,7 @@ delete(){
             echo -e "\e[31mDeleting game: $name (AppID: $appid)\e[0m"
 
           # remove the dirs under compatdata and shadercache
-          for data_dir in "$ACF_DIR/$DATA_DIR" "$ACF_DIR/$SHADER_DIR" "$USER_DATA_DIR" "$ACF_DIR/$INSTALL_DIR"; do
+          for data_dir in "$ACF_DIR/$DATA_DIR" "$ACF_DIR/$SHADER_DIR" "$ACF_DIR/$INSTALL_DIR"; do
             if [ -d "$data_dir" ]; then
               if [ -e "$data_dir/$appid" ] || [ -L "$data_dir/$appid" ]; then
                 rm -rf "$data_dir/$appid"
@@ -72,9 +72,15 @@ delete(){
                 rm -rf "$data_dir/$name"
                 echo -e "\e[31mRemoved $data_dir/$name\e[0m"
               fi
+              # since the user_data_dir has multiple folders 1 level down need to check for the appid in all of those
+              if [ -d "$USER_DATA_DIR" ]; then
+               find "$USER_DATA_DIR" -type d -name "$appid" -exec rm -rf {} + -print 2>/dev/null | while read -r removed_dir; do
+                  echo -e "\e[31mRemoved $removed_dir\e[0m"
+                done
+              fi
             fi
           done
-          echo -e "\e[31mRemoved appid $appid from compatdata/shadercache and library folders\e[0m"
+          echo -e "\e[31mRemoved appid $appid from compatdata/shadercache and other library folders\e[0m"
       fi
   done
   # regenerate the game database
