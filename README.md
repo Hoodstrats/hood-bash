@@ -7,8 +7,10 @@ There might be other scripts out there that do the same thing but I decided to m
 ## Scripts
 #### hood_steam.sh
 - I was tired of looking up the game store appids in order to clean up any leftover files and folders when I uninstalled them. 
-    - RUN THIS SCRIPT FIRST with the delete [-d] flag and type in the game name not case-sensitive
-    this will clean up the compatdata, shadercache, userdata and common folders
+    - RUN THIS SCRIPT FIRST with the delete [-d] flag and type in the game name not case-sensitive ``you can also type in partial names as well. Just make sure you don't try to delete "demo" and there's more than 1 game with that name, etc``
+    this will clean up the compatdata, shadercache, userdata and common folders ``the common folder installs sometimes have a different naming scheme so they might dodge the deletion``
+
+		##### ``WARNING: this will delete your save files or anything else the game stores in USERDATA``
     - you still have to manually run the uninstall from within steam AFTER DOING THE SCRIPT PART 
 - running it with list [-l] flag will simply list all the steam games you currently have installed and create a installed_games.db file within the script's directory
 ```
