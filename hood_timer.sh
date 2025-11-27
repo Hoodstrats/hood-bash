@@ -56,7 +56,7 @@ timer() {
         exit 1
     fi
     countdown
-    dunstify --urgency=normal "Timer expired!"
+    dunstify --urgency=normal -h string:font:'monospace 24' "⏰ Timer expired!"
     echo -e "\e[31m\nTime's up!"
 }
 countdown() {
@@ -70,7 +70,9 @@ countdown() {
             echo -ne "\r\033[KTime remaining: $mins minutes and $secs seconds"
         else
             echo -ne "\r\033[KTime remaining: $total_time seconds"
-            if [ $total_time -le $((TIME / 2)) ]; then
+            if [ $total_time -le 5 ]; then
+                echo -ne "\e[31m" # Set text color to red
+            elif [ $total_time -le $((TIME / 2)) ]; then
                 echo -ne "\e[33m" # Set text color to yellow
             else
                 echo -ne "\e[32m" # Set text color to green
