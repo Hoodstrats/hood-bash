@@ -7,6 +7,14 @@
 trap "echo -e \"\e[31mClosing stream safely so this doesn't randomly run again...\e[0m\"; exit 130" SIGINT
 
 function watch() {
+  CHAT=0
+  for arg in "$@"; do
+    if [ "$arg" == "--chat" ] || [ "$arg" == "-c" ]; then
+      CHAT=1
+      # Remove the chat argument from the list so we don't have to adjust the original arguments below
+      set -- "${@/"$arg"}"
+    fi
+  done
   if [ "$1" == "-y" ] || [ "$1" == "--youtube" ]; then
     youtube "$2" "$3"
   elif [ "$1" == "-t" ] || [ "$1" == "--twitch" ]; then
@@ -39,12 +47,21 @@ function youtube(){
         echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
         exit 1
       else
+        if [ $CHAT -eq 1 ]; then
+          xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
+        fi
         streamlink -p mpv https://www.youtube.com/@"$1" best
       fi
       else
+        if [ $CHAT -eq 1 ]; then
+          xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
+        fi
         streamlink -p mpv https://www.youtube.com/@"$1" 720p
       fi
       else
+        if [ $CHAT -eq 1 ]; then
+          xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
+        fi
       streamlink -p mpv https://www.youtube.com/@"$1" 480p
     fi
   elif [ "$2" != null ]; then
@@ -59,6 +76,9 @@ function youtube(){
       echo "$check_output"
       exit 1
     fi
+      if [ $CHAT -eq 1 ]; then
+        xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
+      fi
     streamlink -p mpv https://www.youtube.com/@"$1" "$2"
   fi
 }
@@ -82,12 +102,21 @@ function twitch(){
           echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
           exit 1
         else
+          if [ $CHAT -eq 1 ]; then
+            xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
+          fi
           streamlink -p mpv --twitch-low-latency twitch.tv/"$1" best
         fi
       else
+        if [ $CHAT -eq 1 ]; then
+          xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
+        fi
         streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 720p60
       fi
     else
+      if [ $CHAT -eq 1 ]; then
+        xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
+      fi
       streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 480p
     fi
   elif [ "$2" != null ]; then
@@ -102,6 +131,9 @@ function twitch(){
       echo "$check_output"
       exit 1
     fi
+      if [ $CHAT -eq 1 ]; then
+        xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
+      fi
     streamlink -p mpv --twitch-low-latency twitch.tv/"$1" "$2"
   fi
 }
@@ -148,17 +180,18 @@ function kick() {
   fi
 }
 function help() {
-  echo -e "\e[32mHoodwatch - A simple Streamlink wrapper for YouTube and Twitch\e[0m"
-  echo -e "\e[32mDeveloped by Hoodstrats\e[0m"
+  echo -e "\e[32mHoodwatch - A simple Streamlink wrapper for YouTube, Twitch and Kick\e[0m"
+  echo -e "\e[32m-- Developed by Hoodstrats --\e[0m"
   echo -e "\e[33m"
   echo "Options:"
-  echo -e "-y, --youtube <channel> [quality] Watch a YouTube channel at specified quality (default 480p)"
-  echo -e "-t, --twitch <channel> [quality] Watch a Twitch channel at specified quality (default 480p)"
-  echo -e "-k, --kick <channel> [quality] Watch a Kick channel at specified quality (default 480p)"
+  echo -e "-y, -t, -k Specify platform: YouTube, Twitch, or Kick"
+  echo -e "[channel name] The name of the channel to watch"
+  echo -e "[quality] Optional stream quality (e.g., 480p, 720p, best)"
+  echo -e "[--chat|-c] Optional flag to open chat in the system's default web browser assigned in xdg-settings"
   echo -e "\e[0m"
   echo -e "\e[31mNOTE: YouTube requires the channels actual @name not display name\e[0m\n"
-  echo "Usage: hoodwatch.sh -<platform> <channel> [quality]"
-  echo "Example: hoodwatch.sh -t ninja 720p"
+  echo "Example: ./hoodwatch.sh -t ninja 720p -c"
+  echo
   echo "If quality is not specified, it tries 480p, 720p, and finally best available"
   exit 0
 }
