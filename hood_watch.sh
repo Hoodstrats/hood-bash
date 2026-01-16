@@ -16,7 +16,10 @@ function watch() {
     fi
   done
   if [ "$1" == "-y" ] || [ "$1" == "--youtube" ]; then
-    youtube "$2" "$3"
+    #youtube "$2" "$3"
+    echo -e "\e[33mYoutube support is currently disabled due to some issues with it (classic Youtube).\e[0m"
+    echo -e "\e[33mMainly cause of this issue here:\e[0m"
+    echo -e "\e[33mhttps://github.com/streamlink/streamlink/issues/6775#issuecomment-3760050631\e[0m"
   elif [ "$1" == "-t" ] || [ "$1" == "--twitch" ]; then
     twitch "$2" "$3"
   elif [ "$1" == "-k" ] || [ "$1" == "--kick" ]; then
@@ -184,7 +187,7 @@ function help() {
   echo -e "\e[32m-- Developed by Hoodstrats --\e[0m"
   echo -e "\e[33m"
   echo "Options:"
-  echo -e "-y, -t, -k Specify platform: YouTube, Twitch, or Kick"
+  echo -e "-y, -t, -k Specify platform: YouTube(currently disabled), Twitch, or Kick"
   echo -e "[channel name] The name of the channel to watch"
   echo -e "[quality] Optional stream quality (e.g., 480p, 720p, best)"
   echo -e "[--chat|-c] Optional flag to open chat in the system's default web browser assigned in xdg-settings"
