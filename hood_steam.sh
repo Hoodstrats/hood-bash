@@ -21,10 +21,28 @@ FIELD1="appid"
 FIELD2="name"
 GAME_DB="installed_games.db"
 
+function entry(){
+  if [[ -z $1 ]]; then
+    help
+  elif [[ $1 == "-l" || $1 == "--list" ]]; then
+    games
+  elif [[ $1 == "-d" || $1 == "--delete" ]]; then
+    # make sure we move the first argument so that the game name(s) can be passed to delete instead of -d
+    shift
+    delete "$@"
+  else
+    help
+  fi
+}
+
 function help() {
+  echo -e "\e[32mA simple Steam game management script\e[0m"
+  echo -e "\e[32m-- Developed by Hoodstrats --\e[0m"
+  echo -e "\e[33m"
   echo "Usage: locate or delete Steam games installed on your system."
-  echo "[-l] locate - List all installed Steam games with their appid and name."
-  echo "[-d] delete - Delete a specified Steam game by name (not case-sensitive)."
+  echo "-l, --list - List all installed Steam games with their appid and name."
+  echo -e "-d, --delete [game name] - Delete a specified Steam game by name (not case-sensitive).\e[0m\n"
+  echo "Example: hood_steam.sh -d "game name here""
   exit 1
 }
 
@@ -52,15 +70,19 @@ function delete(){
     echo "$output" > "$GAME_DB"
     echo -e "\e[32m----Game database generated at ("$PWD"/"$GAME_DB")----\e[0m"
   fi
+  if [ -n "$1" ]; then
+    del=$1
+  else
+    read -p "Enter the name of the game you want to delete: " del
+  fi
   # take input from the user and delete the corresponding acf file
   # along with all the folders that share the same appid
-  read -p "Enter the name of the game you want to delete: " del
   find "$ACF_DIR" -type f -name "*.acf" | while read -r acf_file; do
       appid=$(grep -m1 '"appid"' "$acf_file" | sed 's/.*"\([0-9]*\)".*/\1/')
       name=$(grep -m1 '"name"' "$acf_file" | sed 's/.*"\([^"]*\)".*/\1/')
       install_loc=$(grep -m1 '"installdir"' "$acf_file" | sed 's/.*"\([^"]*\)".*/\1/')
       if [[ "${name,,}" == *"${del,,}"* ]]; then
-            echo -e "\e[31mDeleting game: $name (AppID: $appid)\e[0m"
+          echo -e "\e[31mDeleting game: $name (AppID: $appid)\e[0m"
 
           # remove the dirs under compatdata and shadercache
           for data_dir in "$ACF_DIR/$DATA_DIR" "$ACF_DIR/$SHADER_DIR"; do
@@ -95,15 +117,4 @@ function delete(){
   echo -e "\e[32m----Game database generated at ("$PWD"/"$GAME_DB")----\e[0m"
 }
 
-function entry(){
-  if [[ -z $1 ]]; then
-    help
-  elif [[ $1 == "-l" ]]; then
-    games
-  elif [[ $1 == "-d" ]]; then
-    delete
-  else
-    help
-  fi
-}
 entry "$@"

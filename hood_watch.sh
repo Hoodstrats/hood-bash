@@ -183,19 +183,19 @@ function kick() {
   fi
 }
 function help() {
-  echo -e "\e[32mHoodwatch - A simple Streamlink wrapper for YouTube, Twitch and Kick\e[0m"
+  echo -e "\e[32mA simple Streamlink wrapper for Youtube, Twitch and Kick\e[0m"
   echo -e "\e[32m-- Developed by Hoodstrats --\e[0m"
   echo -e "\e[33m"
   echo "Options:"
-  echo -e "-y, -t, -k Specify platform: YouTube(currently disabled), Twitch, or Kick"
+  echo -e "-y, -t, -k Specify platform: Youtube(currently disabled), Twitch, or Kick"
   echo -e "[channel name] The name of the channel to watch"
   echo -e "[quality] Optional stream quality (e.g., 480p, 720p, best)"
   echo -e "[--chat|-c] Optional flag to open chat in the system's default web browser assigned in xdg-settings"
   echo -e "\e[0m"
-  echo -e "\e[31mNOTE: YouTube requires the channels actual @name not display name\e[0m\n"
   echo "Example: ./hoodwatch.sh -t ninja 720p -c"
-  echo
-  echo "If quality is not specified, it tries 480p, 720p, and finally best available"
+  echo -e "If quality is not specified, it tries 480p, 720p, and finally best available\n"
+  echo -e "\e[31mNOTE: Youtube currently disabled due to API changes \e[0m"
+  echo -e "\e[31mhttps://github.com/streamlink/streamlink/issues/6775#issuecomment-3760050631\e[0m"
   exit 0
 }
 
