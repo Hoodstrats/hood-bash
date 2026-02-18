@@ -34,64 +34,61 @@ function checkStores() {
       echo -e "\e[31m$store is not installed\e[0m"
     fi
   done
-  echo -e "\e[32m===============================\e[0m"
 }
 
 function runUpdate() {
-  echo "Checking for regular System updates..."
+  echo -e "\e[32m===============================\e[0m"
+  echo -e "\e[32mChecking for regular System updates...\e[0m"
   sudo apt update
   # List upgradable packages and count them
   numUpgradable=$(sudo apt list --upgradable 2>/dev/null | grep -c upgradable)
 
   # Check if there are updates available
   if [ "$numUpgradable" -eq 0 ]; then
-    echo "No updates available..."
+    echo -e "\e[33mNo updates available...\e[0m"
   else
-    echo "There are $numUpgradable updates available."
+    echo -e "\e[32mThere are $numUpgradable updates available.\e[0m"
     sudo apt upgrade -y
   fi
   sleep 1
-  echo -e "\e[32m"
-  echo "==============================="
-  echo -e "\e[0m"
+
   if [ -x "$(command -v flatpak)" ]; then
-    echo -e "Checking for Flatpak updates...\n"
+    echo -e "\e[32m===============================\e[0m"
+    echo -e "\e[32mChecking for Flatpak updates...\e[0m"
     flatpak update
+    echo -e "\e[32m===============================\e[0m"
   fi
   sleep 1
-  echo -e "\e[32m"
-  echo "==============================="
-  echo -e "\e[0m"
+
   #check if the user has brew installed
   if [ -x "$(command -v brew)" ]; then
-    echo -e "Checking for brew updates...\n"
+    echo -e "\e[32m===============================\e[0m"
+    echo -e "\e[32mChecking for brew updates...\e[0m"
     brew update
     #check if there are any upgrades available
     if [ -n "$(brew outdated)" ]; then
       brew upgrade
     else
-      echo -e "No brew upgrades available...\n"
+      echo -e "\e[33mNo brew upgrades available...\e[0m"
     fi
+    echo -e "\e[32m===============================\e[0m"
   fi
   sleep 1
-  echo -e "\e[32m"
-  echo "==============================="
-  echo -e "\e[0m"
+
   if [ -x "$(command -v snap)" ]; then
-    echo -e "Checking for Snap updates...\n"
+    echo -e "\e[32m===============================\e[0m"
+    echo -e "\e[32mChecking for Snap updates...\e[0m"
     sudo snap refresh
+    echo -e "\e[32m===============================\e[0m"
   fi
-  echo -e "\e[32m"
-  echo -e "All updates have been checked for and installed."
-  echo -e "\e[0m"
+  echo -e "\n\e[32mAll updates have been checked for and installed.\e[0m\n"
   runClean
 }
 
 function runClean() {
-  echo -e "\e[32m"
-  echo "==============================="
-  echo -e "\e[0m"
+  echo -e "\e[33m===============================\e[0m"
   echo -e "\e[33mDoing some house keeping...\e[0m"
+  echo -e "\e[33m===============================\e[0m"
   echo -e "\e[33mCleaning up APT...\e[0m"
   # Use the correct apt subcommand 'autoremove' if on linux mint
   output=$(sudo apt auto-remove -y 2>&1)
@@ -103,27 +100,24 @@ function runClean() {
   fi
     sudo apt autoclean -y
   sleep 1
-  echo -e "\e[32m"
-  echo "==============================="
-  echo -e "\e[0m"
 
   if [ -x "$(command -v flatpak)" ]; then
-    echo -e "Cleaning up Flatpak...\n"
+    echo -e "\e[33m===============================\e[0m"
+    echo -e "\e[33mCleaning up Flatpak...\e[0m"
     flatpak uninstall --unused
   fi
 
   sleep 1
-  echo -e "\e[32m"
-  echo "==============================="
-  echo -e "\e[0m"
 
   if [ -x "$(command -v brew)" ]; then
-    echo -e "Cleaning up Brew...\n"
+    echo -e "\e[33m===============================\e[0m"
+    echo -e "\e[33mCleaning up Brew...\e[0m"
     brew cleanup
   fi
 
   sleep 1
-  echo -e "Jobs done, exiting script!"
+  echo -e "\e[33m===============================\e[0m"
+  echo -e "\n\e[32mJobs done, exiting script!\e[0m"
   exit 1
 }
 checkForInput
