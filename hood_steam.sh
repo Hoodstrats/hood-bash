@@ -75,41 +75,75 @@ function delete(){
   else
     read -p "Enter the name of the game you want to delete: " del
   fi
-  # take input from the user and delete the corresponding acf file
-  # along with all the folders that share the same appid
-  find "$ACF_DIR" -type f -name "*.acf" | while read -r acf_file; do
-      appid=$(grep -m1 '"appid"' "$acf_file" | sed 's/.*"\([0-9]*\)".*/\1/')
-      name=$(grep -m1 '"name"' "$acf_file" | sed 's/.*"\([^"]*\)".*/\1/')
-      install_loc=$(grep -m1 '"installdir"' "$acf_file" | sed 's/.*"\([^"]*\)".*/\1/')
-      if [[ "${name,,}" == *"${del,,}"* ]]; then
-          echo -e "\e[31mDeleting game: $name (AppID: $appid)\e[0m"
 
-          # remove the dirs under compatdata and shadercache
-          for data_dir in "$ACF_DIR/$DATA_DIR" "$ACF_DIR/$SHADER_DIR"; do
-            if [ -d "$data_dir" ]; then
-              if [ -e "$data_dir/$appid" ] || [ -L "$data_dir/$appid" ]; then
-                rm -rf "$data_dir/$appid"
-                echo -e "\e[31mRemoved $data_dir/$appid\e[0m"
-              fi
-            fi
-          done
+  # account for multiple matches
+  local match_appids=()
+  local match_names=()
 
-          # remove the actual game install directory using installdir entry in the acf file
-          install_path="$ACF_DIR/$INSTALL_DIR/$install_loc"
-          if [ -d "$install_path" ]; then
-            rm -rf "$install_path"
-            echo -e "\e[31mRemoved $install_path\e[0m"
-          fi
+  while IFS= read -r acf_file; do
+    appid=$(grep -m1 '"appid"' "$acf_file" | sed 's/.*"\([0-9]*\)".*/\1/')
+    name=$(grep -m1 '"name"' "$acf_file" | sed 's/.*"\([^"]*\)".*/\1/')
+    if [[ "${name,,}" == *"${del,,}"* ]]; then
+      match_appids+=("$appid")
+      match_names+=("$name")
+    fi
+  done < <(find "$ACF_DIR" -type f -name "*.acf")
 
-          # since the user_data_dir has multiple folders 1 level down need to check for the appid in all of those
-          if [ -d "$USER_DATA_DIR" ]; then
-            find "$USER_DATA_DIR" -type d -name "$appid" -exec rm -rf {} + -print 2>/dev/null | while read -r removed_dir; do
-              echo -e "\e[31mRemoved $removed_dir\e[0m"
-            done
-          fi
-          echo -e "\e[31mRemoved appid $appid from compatdata/shadercache and other library folders\e[0m"
+  local count=${#match_appids[@]}
+
+  if [ "$count" -eq 0 ]; then
+    echo -e "\e[33mNo matching games found: $del\e[0m"
+    return 1
+  elif [ "$count" -gt 1 ]; then
+    echo -e "\e[33mMultiple games found \"$del\":\e[0m"
+    for i in "${!match_names[@]}"; do
+      echo "  $((i+1))) ${match_names[$i]} (AppID: ${match_appids[$i]})"
+    done
+    read -p "Enter the number of the game you want to delete (0 to cancel): " choice
+    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -eq 0 ] || [ "$choice" -gt "$count" ]; then
+      echo "Cancelled."
+      return 0
+    fi
+    local idx=$((choice-1))
+  else
+    local idx=0
+  fi
+
+  local appid="${match_appids[$idx]}"
+  local name="${match_names[$idx]}"
+  # look up install_loc from the acf file matching the selected appid
+  local acf_file
+  acf_file=$(grep -rl "\"appid\"" "$ACF_DIR" --include="*.acf" | xargs grep -l "\"$appid\"" | head -1)
+  local install_loc
+  install_loc=$(grep -m1 '"installdir"' "$acf_file" | sed 's/.*"\([^"]*\)".*/\1/')
+
+  echo -e "\e[31mDeleting game: $name (AppID: $appid)\e[0m"
+
+  # remove the dirs under compatdata and shadercache
+  for data_dir in "$ACF_DIR/$DATA_DIR" "$ACF_DIR/$SHADER_DIR"; do
+    if [ -d "$data_dir" ]; then
+      if [ -e "$data_dir/$appid" ] || [ -L "$data_dir/$appid" ]; then
+        rm -rf "$data_dir/$appid"
+        echo -e "\e[31mRemoved $data_dir/$appid\e[0m"
       fi
+    fi
   done
+
+  # remove the actual game install directory using installdir entry in the acf file
+  install_path="$ACF_DIR/$INSTALL_DIR/$install_loc"
+  if [ -d "$install_path" ]; then
+    rm -rf "$install_path"
+    echo -e "\e[31mRemoved $install_path\e[0m"
+  fi
+
+  # since the user_data_dir has multiple folders 1 level down, we need to check for the appid in all of those
+  if [ -d "$USER_DATA_DIR" ]; then
+    find "$USER_DATA_DIR" -type d -name "$appid" -exec rm -rf {} + -print 2>/dev/null | while read -r removed_dir; do
+      echo -e "\e[31mRemoved $removed_dir\e[0m"
+    done
+  fi
+  echo -e "\e[31mRemoved appid $appid from compatdata/shadercache and other library folders\e[0m"
+
   # regenerate the game database
   echo -e "\e[33mRegenerating game database...\e[0m"
   output=$(games)
