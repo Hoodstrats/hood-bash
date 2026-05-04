@@ -8,24 +8,37 @@ trap "echo -e \"\e[31mClosing stream safely so this doesn't randomly run again..
 
 function watch() {
   CHAT=0
+  RECORD=0
+  PLATFORM=""
+  CHANNEL=""
+  QUALITY=""
   for arg in "$@"; do
     if [ "$arg" == "--chat" ] || [ "$arg" == "-c" ]; then
       CHAT=1
-      # Remove the chat argument from the list so we don't have to adjust the original arguments below
-      set -- "${@/"$arg"}"
+    elif [ "$arg" == "--record" ] || [ "$arg" == "-r" ]; then
+      RECORD=1
+    elif [ "$arg" == "-y" ] || [ "$arg" == "--youtube" ]; then
+      PLATFORM="youtube"
+    elif [ "$arg" == "-t" ] || [ "$arg" == "--twitch" ]; then
+      PLATFORM="twitch"
+    elif [ "$arg" == "-k" ] || [ "$arg" == "--kick" ]; then
+      PLATFORM="kick"
+    elif [ "$arg" == "-h" ] || [ "$arg" == "--help" ]; then
+      help
+    elif [ -z "$CHANNEL" ]; then
+      CHANNEL="$arg"
+    else
+      QUALITY="$arg"
     fi
   done
-  if [ "$1" == "-y" ] || [ "$1" == "--youtube" ]; then
-    #youtube "$2" "$3"
+  if [ "$PLATFORM" == "youtube" ]; then
     echo -e "\e[33mYoutube support is currently disabled due to some issues with it (classic Youtube).\e[0m"
     echo -e "\e[33mMainly cause of this issue here:\e[0m"
     echo -e "\e[33mhttps://github.com/streamlink/streamlink/issues/6775#issuecomment-3760050631\e[0m"
-  elif [ "$1" == "-t" ] || [ "$1" == "--twitch" ]; then
-    twitch "$2" "$3"
-  elif [ "$1" == "-k" ] || [ "$1" == "--kick" ]; then
-    kick "$2" "$3"
-  elif [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
-    help
+  elif [ "$PLATFORM" == "twitch" ]; then
+    twitch "$CHANNEL" "$QUALITY"
+  elif [ "$PLATFORM" == "kick" ]; then
+    kick "$CHANNEL" "$QUALITY"
   else
     help
   fi
@@ -36,7 +49,6 @@ function youtube(){
     echo "Please provide a YouTube channel name or ID."
     exit 1
   fi
-  
   if [ -z "$2" ]; then
     echo -e "\e[32mTrying $1 at 480p...\e[0m"
     check_output=$(streamlink --stream-url https://www.youtube.com/@"$1" 480p 2>&1)
@@ -53,19 +65,31 @@ function youtube(){
         if [ $CHAT -eq 1 ]; then
           xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
         fi
-        streamlink -p mpv https://www.youtube.com/@"$1" best
+        if [ $RECORD -eq 1 ]; then
+          streamlink -p mpv --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" best
+        else
+          streamlink -p mpv https://www.youtube.com/@"$1" best
+        fi
       fi
       else
         if [ $CHAT -eq 1 ]; then
           xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
         fi
-        streamlink -p mpv https://www.youtube.com/@"$1" 720p
+        if [ $RECORD -eq 1 ]; then
+          streamlink -p mpv --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" 720p
+        else
+          streamlink -p mpv https://www.youtube.com/@"$1" 720p
+        fi
       fi
       else
         if [ $CHAT -eq 1 ]; then
           xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
         fi
-      streamlink -p mpv https://www.youtube.com/@"$1" 480p
+        if [ $RECORD -eq 1 ]; then
+          streamlink -p mpv --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" 480p
+        else
+          streamlink -p mpv https://www.youtube.com/@"$1" 480p
+        fi
     fi
   elif [ "$2" != null ]; then
     echo -e "\e[32mTrying $1 at $2...\e[0m"
@@ -79,10 +103,14 @@ function youtube(){
       echo "$check_output"
       exit 1
     fi
-      if [ $CHAT -eq 1 ]; then
-        xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
-      fi
-    streamlink -p mpv https://www.youtube.com/@"$1" "$2"
+    if [ $CHAT -eq 1 ]; then
+      xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
+    fi
+    if [ $RECORD -eq 1 ]; then
+      streamlink -p mpv --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" "$2"
+    else
+      streamlink -p mpv https://www.youtube.com/@"$1" "$2"
+    fi
   fi
 }
 
@@ -108,19 +136,31 @@ function twitch(){
           if [ $CHAT -eq 1 ]; then
             xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
           fi
-          streamlink -p mpv --twitch-low-latency twitch.tv/"$1" best
+          if [ $RECORD -eq 1 ]; then
+            streamlink -p mpv --twitch-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" best
+          else
+            streamlink -p mpv --twitch-low-latency twitch.tv/"$1" best
+          fi
         fi
       else
         if [ $CHAT -eq 1 ]; then
           xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
         fi
-        streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 720p60
+        if [ $RECORD -eq 1 ]; then
+          streamlink -p mpv --twitch-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" 720p60
+        else
+          streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 720p60
+        fi
       fi
     else
       if [ $CHAT -eq 1 ]; then
         xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
       fi
-      streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 480p
+      if [ $RECORD -eq 1 ]; then
+        streamlink -p mpv --twitch-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" 480p
+      else
+        streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 480p
+      fi
     fi
   elif [ "$2" != null ]; then
     echo -e "\e[32mTrying $1 at $2...\e[0m"
@@ -134,10 +174,14 @@ function twitch(){
       echo "$check_output"
       exit 1
     fi
-      if [ $CHAT -eq 1 ]; then
-        xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
-      fi
-    streamlink -p mpv --twitch-low-latency twitch.tv/"$1" "$2"
+    if [ $CHAT -eq 1 ]; then
+      xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
+    fi
+    if [ $RECORD -eq 1 ]; then
+      streamlink -p mpv --twitch-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" "$2"
+    else
+      streamlink -p mpv --twitch-low-latency twitch.tv/"$1" "$2"
+    fi
   fi
 }
 function kick() {
@@ -159,13 +203,25 @@ function kick() {
           echo -e "\e[31mFailed to start stream. Channel might be offline or unavailable.\e[0m"
           exit 1
         else
-          streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" best
+          if [ $RECORD -eq 1 ]; then
+            streamlink -p mpv --kick-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" best
+          else
+            streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" best
+          fi
         fi
       else
-        streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 720p60
+        if [ $RECORD -eq 1 ]; then
+          streamlink -p mpv --kick-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" 720p60
+        else
+          streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 720p60
+        fi
       fi
     else
-      streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 480p
+      if [ $RECORD -eq 1 ]; then
+        streamlink -p mpv --kick-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" 480p
+      else
+        streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 480p
+      fi
     fi
   elif [ "$2" != null ]; then
     echo -e "\e[32mTrying $1 at $2...\e[0m"
@@ -179,23 +235,29 @@ function kick() {
       echo "$output"
       exit 1
     fi
-    streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" "$2"
+    if [ $RECORD -eq 1 ]; then
+      streamlink -p mpv --kick-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" "$2"
+    else
+      streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" "$2"
+    fi
   fi
 }
 function help() {
-  echo -e "\e[32mA simple Streamlink wrapper for Youtube, Twitch and Kick\e[0m"
-  echo -e "\e[32m-- Developed by Hoodstrats --\e[0m"
-  echo -e "\e[33m"
+  echo "Usage: hood_watch.sh [platform] [channel] [quality] [options]"
   echo "Options:"
-  echo -e "-y, -t, -k Specify platform: Youtube(currently disabled), Twitch, or Kick"
-  echo -e "[channel name] The name of the channel to watch"
-  echo -e "[quality] Optional stream quality (e.g., 480p, 720p, best)"
-  echo -e "[--chat|-c] Optional flag to open chat in the system's default web browser assigned in xdg-settings"
-  echo -e "\e[0m"
-  echo "Example: ./hoodwatch.sh -t ninja 720p -c"
-  echo -e "If quality is not specified, it tries 480p, 720p, and finally best available\n"
-  echo -e "\e[31mNOTE: Youtube currently disabled due to API changes \e[0m"
-  echo -e "\e[31mhttps://github.com/streamlink/streamlink/issues/6775#issuecomment-3760050631\e[0m"
+  echo "  -y, --youtube [channel]  Watch a Youtube stream (currently disabled)"
+  echo "  -t, --twitch [channel]   Watch a Twitch stream"
+  echo "  -k, --kick [channel]     Watch a Kick stream"
+  echo "  [quality]                Optional stream quality (e.g., 480p, 720p, best)"
+  echo "  --chat, -c               Open chat in the default web browser"
+  echo "  --record, -r             Record the stream while playing"
+  echo "  -h, --help               Show this help message"
+  echo "Examples:"
+  echo "  hood_watch.sh -t ninja 720p -c"
+  echo "  hood_watch.sh -k xqc best -r"
+  echo "  hood_watch.sh -t shroud -r -c"
+  echo "If quality is not specified, it tries 480p, 720p, and finally best available."
+  echo -e "\e[31mNOTE: Youtube currently disabled - https://github.com/streamlink/streamlink/issues/6775\e[0m"
   exit 0
 }
 
