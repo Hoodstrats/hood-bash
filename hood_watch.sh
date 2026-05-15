@@ -66,7 +66,7 @@ function youtube(){
           xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
         fi
         if [ $RECORD -eq 1 ]; then
-          streamlink -p mpv --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" best
+          streamlink -p mpv --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" best
         else
           streamlink -p mpv https://www.youtube.com/@"$1" best
         fi
@@ -76,7 +76,7 @@ function youtube(){
           xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
         fi
         if [ $RECORD -eq 1 ]; then
-          streamlink -p mpv --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" 720p
+          streamlink -p mpv --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" 720p
         else
           streamlink -p mpv https://www.youtube.com/@"$1" 720p
         fi
@@ -86,7 +86,7 @@ function youtube(){
           xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
         fi
         if [ $RECORD -eq 1 ]; then
-          streamlink -p mpv --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" 480p
+          streamlink -p mpv --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" 480p
         else
           streamlink -p mpv https://www.youtube.com/@"$1" 480p
         fi
@@ -107,7 +107,7 @@ function youtube(){
       xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
     fi
     if [ $RECORD -eq 1 ]; then
-      streamlink -p mpv --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" "$2"
+      streamlink -p mpv --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" https://www.youtube.com/@"$1" "$2"
     else
       streamlink -p mpv https://www.youtube.com/@"$1" "$2"
     fi
@@ -137,7 +137,7 @@ function twitch(){
             xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
           fi
           if [ $RECORD -eq 1 ]; then
-            streamlink -p mpv --twitch-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" best
+            streamlink -p mpv --twitch-low-latency --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" best
           else
             streamlink -p mpv --twitch-low-latency twitch.tv/"$1" best
           fi
@@ -147,7 +147,7 @@ function twitch(){
           xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
         fi
         if [ $RECORD -eq 1 ]; then
-          streamlink -p mpv --twitch-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" 720p60
+          streamlink -p mpv --twitch-low-latency --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" 720p60
         else
           streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 720p60
         fi
@@ -157,7 +157,7 @@ function twitch(){
         xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
       fi
       if [ $RECORD -eq 1 ]; then
-        streamlink -p mpv --twitch-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" 480p
+        streamlink -p mpv --twitch-low-latency --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" 480p
       else
         streamlink -p mpv --twitch-low-latency twitch.tv/"$1" 480p
       fi
@@ -178,7 +178,7 @@ function twitch(){
       xdg-open "https://www.twitch.tv/popout/$1/chat?popout=" >/dev/null 2>&1 &
     fi
     if [ $RECORD -eq 1 ]; then
-      streamlink -p mpv --twitch-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" "$2"
+      streamlink -p mpv --twitch-low-latency --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" twitch.tv/"$1" "$2"
     else
       streamlink -p mpv --twitch-low-latency twitch.tv/"$1" "$2"
     fi
@@ -204,21 +204,21 @@ function kick() {
           exit 1
         else
           if [ $RECORD -eq 1 ]; then
-            streamlink -p mpv --kick-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" best
+            streamlink -p mpv --kick-low-latency --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" best
           else
             streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" best
           fi
         fi
       else
         if [ $RECORD -eq 1 ]; then
-          streamlink -p mpv --kick-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" 720p60
+          streamlink -p mpv --kick-low-latency --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" 720p60
         else
           streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 720p60
         fi
       fi
     else
       if [ $RECORD -eq 1 ]; then
-        streamlink -p mpv --kick-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" 480p
+        streamlink -p mpv --kick-low-latency --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" 480p
       else
         streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" 480p
       fi
@@ -236,7 +236,7 @@ function kick() {
       exit 1
     fi
     if [ $RECORD -eq 1 ]; then
-      streamlink -p mpv --kick-low-latency --record "{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" "$2"
+      streamlink -p mpv --kick-low-latency --record "$HOME/Videos/{author}-{time:%Y%m%d%H%M%S}.ts" https://www.kick.com/"$1" "$2"
     else
       streamlink -p mpv --kick-low-latency https://www.kick.com/"$1" "$2"
     fi
