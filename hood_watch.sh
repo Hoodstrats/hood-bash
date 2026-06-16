@@ -9,6 +9,7 @@ trap "echo -e \"\e[31mClosing stream safely so this doesn't randomly run again..
 function watch() {
   CHAT=0
   RECORD=0
+  DIRECT=0
   PLATFORM=""
   CHANNEL=""
   QUALITY=""
@@ -23,6 +24,10 @@ function watch() {
       PLATFORM="twitch"
     elif [ "$arg" == "-k" ] || [ "$arg" == "--kick" ]; then
       PLATFORM="kick"
+    # bypass everything on twitch if you just want to see a VOD or something
+    elif [[ $arg == *twitch* ]]; then
+      DIRECT=1
+      CHANNEL="$arg"
     elif [ "$arg" == "-h" ] || [ "$arg" == "--help" ]; then
       help
     elif [ -z "$CHANNEL" ]; then
@@ -35,7 +40,7 @@ function watch() {
     echo -e "\e[33mYoutube support is currently disabled due to some issues with it (classic Youtube).\e[0m"
     echo -e "\e[33mMainly cause of this issue here:\e[0m"
     echo -e "\e[33mhttps://github.com/streamlink/streamlink/issues/6775#issuecomment-3760050631\e[0m"
-  elif [ "$PLATFORM" == "twitch" ]; then
+  elif [ "$PLATFORM" == "twitch" ] || [ $DIRECT -eq 1 ]; then
     twitch "$CHANNEL" "$QUALITY"
   elif [ "$PLATFORM" == "kick" ]; then
     kick "$CHANNEL" "$QUALITY"
@@ -115,6 +120,9 @@ function youtube(){
 }
 
 function twitch(){
+  if [ $DIRECT -eq 1 ]; then
+    streamlink -p mpv --twitch-low-latency $CHANNEL $QUALITY
+  fi
   if [ -z "$1" ]; then
     echo "Please provide a Twitch channel name."
     exit 1

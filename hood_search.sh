@@ -3,14 +3,21 @@
 #= @hoodstrats on all socials  =#
 #===============================#
 
-# TODO: add the option to make Flatpak only show offically approved packages 
+# TODO: add the option to make Flatpak only show offically approved packages
 # flatpak remote-modify --subset=verified flathub
 
 #set the current directory to the directory of the script
 #this way we have a reference point for the stores.txt file
 cd "$(dirname "$0")"
 
-stores=()
+# replaced mapfile stores.txt with hardcoded array of stores for simplicity and to avoid issues with file reading
+stores=(
+    apt
+    brew
+    snap
+    flatpak
+    cargo
+)
 
 #populate this after search with results
 checkedStores=()
@@ -33,28 +40,38 @@ installCommands=(
   "install"
 )
 
-#get stores from a text file within the same directory seperated by new lines
-mapfile -t stores <./stores.txt
-
 # the app name to search for
 APP_NAME=""
 
-#set the color of the text to bright green
-echo -e "\e[32m"
-echo "==============================="
-echo -e "\e[31mHoodstrats Search Utility v1.0\e[0m"
-echo -e "\e[32m==============================="
-echo -e "\e[0m"
+GREEN='\e[32m'
+RED='\e[31m'
+YELLOW='\e[33m'
+RESET='\e[0m'
+
+color_this() {
+  local color
+  case "$1" in
+    green)  color=$GREEN ;;
+    red)    color=$RED ;;
+    yellow) color=$YELLOW ;;
+    *)      color=$RESET ;;
+  esac
+  echo -e "${color}${*:2}${RESET}"
+}
+
+color_this green "==============================="
+color_this green "Hoodstrats Search Utility v1.0"
+color_this green "==============================="
 
 #just to make sure there's internet available period
 check_internet() {
-  echo -e "\e[33mChecking for internet connection...\e[0m"
+  color_this yellow "Checking for internet connection..."
   if ping -c 1 8.8.8.8 &>/dev/null; then
-    echo -e "\e[32mInternet connection available\e[0m"
+    color_this green "Internet connection available"
     checkStores
   else
-    echo -e "\e[31mNo internet connection\e[0m"
-    echo -e "\e[31mExiting...\e[0m"
+    color_this red "No internet connection"
+    color_this red "Exiting..."
   fi
 }
 
@@ -63,11 +80,11 @@ function checkStores() {
   echo -e "\nChecking for installed update stores..."
   for store in "${stores[@]}"; do
     if [ -x "$(command -v $store)" ]; then
-      echo -e "\e[32m$store is installed\e[0m"
+      color_this green "$store is installed"
       #populate with actually installed stores
       checkedStores+=("$store")
     else
-      echo -e "\e[31m$store is not installed\e[0m"
+      color_this red "$store is not installed"
     fi
   done
   echo "==============================="
@@ -83,12 +100,12 @@ function searchStores() {
     if [ -x "$(command -v $store)" ]; then
       case $store in
       "apt")
-        echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
+        color_this yellow "Searching $store for $RESPONSE..."
         # sudo apt ${searchCommands[0]} "^$RESPONSE$"
         # 2>&1 to capture stderr in case --names-only is not supported
         search_output=$(apt ${searchCommands[0]} "^$RESPONSE"'$' 2>&1)
         if echo "$search_output" | grep -q "unrecognized option '--names-only'"; then
-          echo -e "\e[31m'--names-only' not supported, retrying without it...\e[0m"
+          color_this red "'--names-only' not supported, retrying without it..."
           # still uses the ^$ to match the exact name of the app regardless of not having the --names-only flag
           search_output=$(apt search "^$RESPONSE"'$')
         fi
@@ -97,13 +114,13 @@ function searchStores() {
         ;;
 
       "brew")
-        echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
+        color_this yellow "Searching $store for $RESPONSE..."
         search_output=$(brew ${searchCommands[1]} "/^$RESPONSE/")
         addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
         ;;
       "flatpak")
-        echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
+        color_this yellow "Searching $store for $RESPONSE..."
         search_output=$(flatpak ${searchCommands[1]} "$RESPONSE")
         #grep the search output for the exact name of the app
         #using -i to ignore case and -w to match whole words
@@ -113,13 +130,13 @@ function searchStores() {
         ;;
 
       "snap")
-        echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
+        color_this yellow "Searching $store for $RESPONSE..."
         search_output=$(snap ${searchCommands[1]} "$RESPONSE")
         addCheckedStores "$store" "$search_output" "$RESPONSE"
         echo "==============================="
         ;;
       "cargo")
-        echo -e "\e[33mSearching $store for $RESPONSE...\e[0m"
+        color_this yellow "Searching $store for $RESPONSE..."
         search_output=$(cargo ${searchCommands[1]} "$RESPONSE")
         #grep the search output for the exact name of the app
         #using -i to ignore case and -w to match whole words
@@ -128,7 +145,7 @@ function searchStores() {
         echo "==============================="
         ;;
       *)
-        echo -e "\e[32mStore not found...\e[0m"
+        color_this green "Store not found..."
         ;;
       esac
     fi
@@ -141,11 +158,11 @@ function addCheckedStores() {
   #using grep -i to ignore case and -w to match whole words -q to suppress output
   #using ^$ to match the exact name of the app like we do for apt
   if echo "$2" | grep -iqw "$3"; then
-    echo -e "\e[32m$1 found $3\e[0m"
+    color_this green "$1 found $3"
     storesWithApps+=("$1")
     echo "$2"
   else
-    echo -e "\e[31m$1 did not find $3\e[0m"
+    color_this red "$1 did not find $3"
   fi
 }
 
@@ -156,19 +173,19 @@ function chooseStore() {
     number=$((number + 1))
   done
   if [[ $number -eq 0 ]]; then
-    echo -e "\e[31mNo stores found with the app\e[0m"
+    color_this red "No stores found with the app"
     exit 1
   fi
-  echo -e "\e[32mChoose which store you would like to install the APP from:\e[0m"
-  echo -e "\e[32m"
+  color_this green "Choose which store you would like to install the APP from:"
+  echo -e "$GREEN"
   read -p "Which store would you like to download from? " storeNumber
   echo "You chose ${storesWithApps[$storeNumber]}..."
-  echo -e "\e[0m"
+  echo -e "$RESET"
   installAPP "$RESPONSE" "${storesWithApps[$storeNumber]}"
 }
 
 function installAPP() {
-  echo -e "\e[32mAttempting to install $1 from $2...\e[0m"
+  color_this green "Attempting to install $1 from $2..."
   case $2 in
   "apt")
     sudo apt ${installCommands[0]} $1
@@ -186,36 +203,36 @@ function installAPP() {
     cargo ${installCommands[0]} $1
     ;;
   *)
-    echo -e "\e[32mStore not found...\e[0m"
+    color_this green "Store not found..."
     ;;
   esac
   # store this info right here into a text file or the stores text
-  echo -e "\e[32m$1 has been installed from $2...\e[0m"
+  color_this green "$1 has been installed from $2..."
   # print the installed info to file
   # using >> instead > APPENDS to file and doesn't overwrite it
   printf "%s\n" "$1 from $2" >>installed.txt
 
-  echo -e "\e[32m\nJobs done, exiting script!\e[0m"
+  color_this green "\nJobs done, exiting script!"
   exit 1
 }
 
 how_to()
 {
-  echo -e "\e[33mUsage: hoodsearch.sh [app-name]\e[0m"
-  echo -e "\e[33mExample: hoodsearch.sh firefox\e[0m"
-  echo -e "\e[33mThis will search all installed package managers for the app and give you the option to install it from one of them.\e[0m"
-  echo -e "\e[33mIf you would like to see a list of installed apps use alias + --installed or -i\e[0m"
-  echo -e "\e[33mExample: hoodsearch.sh -i\e[0m"
+  color_this yellow "Usage: hoodsearch.sh [app-name]"
+  color_this yellow "Example: hoodsearch.sh firefox"
+  color_this yellow "This will search all installed package managers for the app and give you the option to install it from one of them."
+  color_this yellow "If you would like to see a list of installed apps use alias + --installed or -i"
+  color_this yellow "Example: hoodsearch.sh -i"
 }
 #check to see if the response is one of the flags
 if [[ "$1" == "--installed" || "$1" == "-i" ]]; then
-  echo -e "\e[32mList of apps installed using this tool:\e[0m"
+  color_this green "List of apps installed using this tool:"
   cat installed.txt
 elif [[ "$1" == "--help" || "$1" == "-h" ]]; then
   how_to
 elif [[ -n "$1" ]]; then
   APP_NAME="$1"
   check_internet
-else 
-  how_to 
+else
+  how_to
 fi

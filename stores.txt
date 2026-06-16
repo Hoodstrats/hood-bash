@@ -1,5 +1,0 @@
-apt
-brew
-flatpak
-snap
-cargo
